@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+*.log
+
+# Dữ liệu (KHÔNG push lên GitHub)
+data/bronze/*.json
+data/silver/*.parquet
+data/quality/
+logs/
+*.csv
+
+# Checkpoint files
+**/checkpoint*.json
+
+# Môi trường và cấu hình cá nhân
+.env
+.venv
+uv.lock
+pyproject.toml  # nếu bạn không muốn chia sẻ dependency (thường thì nên push)
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store
