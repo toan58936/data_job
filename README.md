@@ -1,7 +1,8 @@
-markdown
 # Hệ thống dữ liệu tuyển dụng ngành Data tại Việt Nam
 
 Hệ thống thu thập, chuẩn hóa và phân tích dữ liệu tuyển dụng các vị trí trong ngành Data (Data Engineer, Data Analyst, Data Scientist, BI, ML/AI) từ nhiều nguồn, nhằm hỗ trợ định hướng nghề nghiệp và phân tích thị trường lao động.
+
+---
 
 ## 🏗️ Kiến trúc tổng thể
 
@@ -9,74 +10,111 @@ Hệ thống được thiết kế theo mô hình **ETL** kết hợp với **Me
 
 - **Bronze Layer**: Dữ liệu thô được crawl từ các trang tuyển dụng (hiện tại: TopCV), lưu dưới dạng JSON.
 - **Silver Layer**: Dữ liệu đã được làm sạch, chuẩn hóa, trích xuất kỹ năng, vai trò, mức lương, kinh nghiệm... lưu dưới dạng Parquet.
-- **Gold Layer (future)**: Các bảng tổng hợp, báo cáo, dashboard phục vụ phân tích.
+- **Gold Layer**: Các bảng tổng hợp, báo cáo, dashboard phục vụ phân tích.
 
-Công nghệ sử dụng:
+**Công nghệ sử dụng**:
+
 - **Node.js + Playwright** – Tầng thu thập (crawler) với khả năng chống bot.
 - **Python + Pandas + PyArrow** – Tầng xử lý và chuẩn hóa.
 - **Typer** – CLI tool để điều phối pipeline.
 - **Pytest** – Kiểm thử đơn vị và tích hợp.
+- **Streamlit + Plotly** – Dashboard phân tích.
 - **uv** – Quản lý môi trường và dependency.
 
-## 📁 Cấu trúc thư mục
-topcv-data-engineer/
-├── crawlers/ # Tầng thu thập (Node.js)
-│ └── src/
-│ ├── topcv-list-crawler.js
-│ ├── topcv-detail-crawler.js
-│ └── topcv-text-crawler.js
-├── transform/ # Tầng xử lý (Python)
-│ ├── src/
-│ │ ├── main.py
-│ │ ├── orchestrator/
-│ │ ├── processors/
-│ │ ├── schemas/
-│ │ ├── io/
-│ │ └── utils/
-│ └── tests/
-│ ├── unit/
-│ └── integration/
-├── data/
-│ ├── bronze/ # Dữ liệu thô JSON (từ crawler)
-│ └── silver/ # Dữ liệu chuẩn hóa Parquet
-├── logs/ # Log của crawler và transform
-├── notebooks/ # Jupyter notebooks cho phân tích
-├── cli.py # CLI tool điều phối pipeline
-├── run_pipeline.ps1 # Script PowerShell chạy toàn bộ pipeline
-└── README.md
+---
 
-text
+## 📁 Cấu trúc thư mục
+
+```
+topcv-data-engineer/
+├── crawlers/                   # Tầng thu thập (Node.js)
+│   └── src/
+│       ├── topcv-list-crawler.js
+│       ├── topcv-detail-crawler.js
+│       └── topcv-text-crawler.js
+├── transform/                  # Tầng xử lý (Python)
+│   ├── src/
+│   │   ├── main.py             # Entry point
+│   │   ├── orchestrator/       # Điều phối pipeline
+│   │   ├── processors/         # Các module chuẩn hóa
+│   │   ├── schemas/            # Schema dữ liệu
+│   │   ├── io/                 # Đọc/ghi dữ liệu
+│   │   ├── quality/            # Data Quality
+│   │   └── utils/              # Tiện ích
+│   └── tests/                  # Unit tests
+├── data/
+│   ├── bronze/                 # Dữ liệu thô JSON (từ crawler)
+│   ├── silver/                 # Dữ liệu chuẩn hóa Parquet
+│   └── quality/                # Báo cáo chất lượng dữ liệu
+├── logs/                       # Log của crawler và transform
+├── notebooks/                  # Jupyter notebooks cho phân tích
+├── scripts/                    # Script hỗ trợ
+├── app.py                      # Dashboard Streamlit
+├── cli.py                      # CLI tool điều phối pipeline
+├── run_pipeline.ps1            # Script PowerShell chạy toàn bộ pipeline
+├── config.yaml                 # Cấu hình pipeline và quality
+├── Makefile                    # Makefile cho pipeline
+└── README.md
+```
+
+---
 
 ## 🚀 Hướng dẫn cài đặt và chạy
 
 ### Yêu cầu
+
 - **Node.js** (v18+)
 - **Python** (v3.10+)
 - **uv** (https://docs.astral.sh/uv/)
 - **Git**
 
 ### 1. Clone dự án
+
 ```bash
-git clone <repository-url>
+git clone https://github.com/your-username/topcv-data-engineer.git
 cd topcv-data-engineer
-2. Cài đặt dependencies
-Python (transform + CLI)
-bash
+```
+
+### 2. Cài đặt dependencies
+
+**Python** (transform + CLI + quality)
+
+```bash
 uv sync
-Node.js (crawler)
-bash
+```
+
+**Node.js** (crawler)
+
+```bash
 cd crawlers
 npm install
 cd ..
-3. Cấu hình (tuỳ chọn)
-Các crawler sử dụng cấu hình có sẵn trong file .js. Bạn có thể điều chỉnh headless, delayBetweenJobs, maxRetries... trong từng file.
+```
 
-4. Chạy pipeline
-Cách 1: Sử dụng script PowerShell (đơn giản)
-powershell
+### 3. Cấu hình (tùy chọn)
+
+Các crawler sử dụng cấu hình có sẵn trong file `.js`. Bạn có thể điều chỉnh `headless`, `delayBetweenJobs`, `maxRetries`...
+
+Cấu hình pipeline và quality có thể chỉnh sửa trong `config.yaml`:
+
+- Ngưỡng cho completeness (`warning_threshold`, `error_threshold`, `field_overrides`)
+- Các stage của Data Quality
+- Định dạng báo cáo
+- Tự động dừng pipeline khi có lỗi
+
+---
+
+## 🎯 Cách sử dụng
+
+### 🔹 Cách 1: Script PowerShell (Đơn giản nhất)
+
+```powershell
 .\run_pipeline.ps1
-Cách 2: Sử dụng CLI tool (linh hoạt hơn)
-bash
+```
+
+### 🔹 Cách 2: CLI tool (Linh hoạt hơn)
+
+```bash
 # Xem trợ giúp
 uv run python cli.py --help
 
@@ -97,73 +135,111 @@ uv run python cli.py status
 
 # Xóa file checkpoint và Silver cũ
 uv run python cli.py clean
-Cách 3: Chạy thủ công từng bước
-bash
-# Crawl danh sách job
-cd crawlers
-node src/topcv-list-crawler.js
 
-# Crawl chi tiết
-node src/topcv-detail-crawler.js
+# Chạy Data Quality
+uv run python cli.py quality
 
-# Crawl text
-node src/topcv-text-crawler.js
-cd ..
+# Chạy Data Quality với config tùy chỉnh
+uv run python cli.py quality --config config.yaml
+```
 
-# Transform
-uv run python -m transform.src.main
-🧪 Kiểm thử
+### 🔹 Cách 3: Makefile
+
+```bash
+# Chạy toàn bộ pipeline
+make all
+# hoặc
+make run
+
+# Chạy riêng từng phần
+make crawl
+make transform
+
+# Dọn dẹp
+make clean
+```
+
+---
+
+## 📊 Data Quality
+
+Hệ thống tự động kiểm tra chất lượng dữ liệu với 5 giai đoạn:
+
+| Giai đoạn    | Mô tả                                                              |
+|--------------|--------------------------------------------------------------------|
+| Completeness | Kiểm tra tỷ lệ dữ liệu thiếu ở các trường quan trọng              |
+| Validity     | Kiểm tra tính hợp lệ (salary_range, exp_range, currency...)        |
+| Accuracy     | Kiểm tra tính chính xác (outlier, lương thỏa thuận...)             |
+| Uniqueness   | Kiểm tra trùng lặp và nhất quán giữa role và title                 |
+| Timeliness   | Kiểm tra tính kịp thời của dữ liệu                                 |
+
+Báo cáo được lưu theo cấu trúc:
+
+```
+data/quality/
+└── 2026-06-19/
+    ├── report_2026-06-19_10-00-00.md
+    └── report_2026-06-19_10-00-00.json
+```
+
+---
+
+## 🧪 Kiểm thử
+
 Chạy tất cả unit tests:
 
-bash
+```bash
 uv run pytest transform/tests/unit/ -v
+```
+
 Chạy integration test:
 
-bash
+```bash
 uv run pytest transform/tests/integration/ -v
-Chạy test cho một processor cụ thể (ví dụ: salary):
+```
 
-bash
+Chạy test cho một module cụ thể (ví dụ: salary):
+
+```bash
 uv run pytest transform/tests/unit/test_salary.py -v
-📊 Dữ liệu đầu ra
-Silver Parquet: data/silver/jobs_silver.parquet
+```
 
-Các trường chính:
+---
 
-job_id, title, company, location_clean
+## 📈 Dashboard
 
-salary_min, salary_max, currency, is_negotiable
+Sau khi có dữ liệu Silver, bạn có thể chạy dashboard Streamlit:
 
-exp_min, exp_max, seniority_level
+```bash
+uv add streamlit plotly
+streamlit run app.py
+```
 
-normalized_role (Data Engineer, Data Analyst, ...)
+Dashboard cung cấp:
 
-skills (danh sách kỹ năng trích xuất)
+- Phân tích lương theo role và seniority
+- Top 20 kỹ năng phổ biến nhất
+- Kỹ năng theo từng vai trò
+- Phân bố địa điểm và hình thức làm việc
+- Domain keywords
 
-domain_keywords (data lake, data warehouse, real-time...)
+---
 
-work_mode, job_work_from_home
+## 🛠️ Phát triển và mở rộng
 
-📓 Phân tích dữ liệu
-Sau khi có Silver, bạn có thể sử dụng Jupyter Notebook để phân tích:
+- **Thêm nguồn dữ liệu mới**: Tạo crawler riêng cho ITviec, VietnamWorks, LinkedIn...
+- **Nâng cấp extract skills**: Sử dụng NLP (spaCy, NER) để trích xuất kỹ năng chính xác hơn.
+- **Thêm stage kiểm tra Bronze**: Kiểm tra dữ liệu thô trước khi transform.
+- **Tầng Gold**: Tạo các bảng tổng hợp (lương trung bình theo role, top skills, phân bố địa điểm) phục vụ dashboard.
 
-bash
-uv add jupyter matplotlib seaborn
-uv run jupyter notebook
-Mở thư mục notebooks/ và bắt đầu khám phá dữ liệu.
+---
 
-🛠️ Phát triển và mở rộng
-Thêm nguồn dữ liệu mới: Tạo crawler riêng cho ITviec, VietnamWorks, LinkedIn… và tích hợp vào pipeline.
+## 📄 License
 
-Nâng cấp extract skills: Sử dụng NLP (spaCy, NER) để trích xuất kỹ năng chính xác hơn.
-
-Tầng Gold: Tạo các bảng tổng hợp (lương trung bình theo role, top skills, phân bố địa điểm) phục vụ dashboard.
-
-📄 License
 MIT
 
-👤 Tác giả
-Tên Nguyễn Văn Toàn – Data/ analyst engineer
+---
 
-text
-Đây là README đầy đủ, chi tiết và chuyên nghiệp. Bạn có thể điều chỉnh tên tác giả, repository URL, và bổ sung thêm phần giới thiệu về mục tiêu dự án nếu cần.
+## 👤 Tác giả
+
+Tên bạn – Data Engineer / Data Scientist
