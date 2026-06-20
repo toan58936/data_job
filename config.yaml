@@ -1,41 +1,28 @@
 # config.yaml
-# Cấu hình chung cho pipeline và quality
-
 pipeline:
   bronze_dir: "data/bronze"
   silver_dir: "data/silver"
   gold_dir: "data/gold"
-  output_format: "parquet"   # parquet hoặc csv
+  output_format: "parquet"
 
 quality:
-  # Ngưỡng cho completeness (có thể override cho từng trường)
   completeness:
     warning_threshold: 0.95
     error_threshold: 0.80
     field_overrides:
       salary_min: 0.25
       salary_max: 0.25
-
-  # Ngưỡng cho validity (số lượng vi phạm)
   validity:
     warning_threshold: 5
     error_threshold: 15
-
-  # Các stage được chạy mặc định (có thể bỏ qua stage nào đó)
   enabled_stages:
     - completeness
     - validity
     - accuracy
     - uniqueness
     - timeliness
-
-  # Định dạng báo cáo
   report_formats:
     - markdown
     - json
-
-  # Thư mục lưu báo cáo
   report_dir: "data/quality"
-
-  # Nếu có lỗi ERROR, có dừng pipeline không?
   stop_on_error: true

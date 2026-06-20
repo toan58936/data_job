@@ -2,7 +2,7 @@
 config.py - Cấu hình cho tầng transform
 """
 import re
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Set
 
 # ==================== 1. DANH SÁCH KỸ NĂNG ====================
 # Các từ khóa kỹ năng phổ biến trong ngành Data (Tiếng Anh và Tiếng Việt)
@@ -101,24 +101,110 @@ ROLE_MAPPING: List[Tuple[str, str]] = [
 
 # ==================== 3. MAPPING ĐỊA ĐIỂM ====================
 LOCATION_MAPPING: Dict[str, str] = {
-    "Hà Nội": "Hà Nội",
-    "Hồ Chí Minh": "Hồ Chí Minh",
-    "Đà Nẵng": "Đà Nẵng",
-    "Hải Phòng": "Hải Phòng",
-    "Cần Thơ": "Cần Thơ",
-    "Bình Dương": "Bình Dương",
-    "Đồng Nai": "Đồng Nai",
-    "Bà Rịa - Vũng Tàu": "Bà Rịa - Vũng Tàu",
-    "Quảng Ninh": "Quảng Ninh",
-    "Khánh Hòa": "Khánh Hòa",
-    "Hưng Yên": "Hưng Yên",
-    "Bắc Ninh": "Bắc Ninh",
-    "Vĩnh Phúc": "Vĩnh Phúc",
-    "Hải Dương": "Hải Dương",
-    "Thái Nguyên": "Thái Nguyên",
-    "Phú Thọ": "Phú Thọ",
-    "Nghệ An": "Nghệ An",
-    "Thanh Hóa": "Thanh Hóa",
+    # ==================== HÀ NỘI ====================
+    "hà nội (mới)": "Hà Nội",
+    "ha noi (new)": "Hà Nội",
+    "hanoi (new)": "Hà Nội",
+    "hà nội": "Hà Nội",
+    "ha noi": "Hà Nội",
+    "hanoi": "Hà Nội",
+    "hn": "Hà Nội",
+    "thủ đô": "Hà Nội",
+
+    # ==================== HỒ CHÍ MINH ====================
+    "hồ chí minh (mới)": "Hồ Chí Minh",
+    "ho chi minh (new)": "Hồ Chí Minh",
+    "thành phố hồ chí minh": "Hồ Chí Minh",
+    "tp.hồ chí minh": "Hồ Chí Minh",
+    "tp hồ chí minh": "Hồ Chí Minh",
+    "hồ chí minh": "Hồ Chí Minh",
+    "ho chi minh": "Hồ Chí Minh",
+    "tp.hcm": "Hồ Chí Minh",
+    "tp hcm": "Hồ Chí Minh",
+    "hcm": "Hồ Chí Minh",
+    "sài gòn": "Hồ Chí Minh",
+    "saigon": "Hồ Chí Minh",
+
+    # ==================== ĐÀ NẴNG ====================
+    "đà nẵng (mới)": "Đà Nẵng",
+    "da nang (new)": "Đà Nẵng",
+    "đà nẵng": "Đà Nẵng",
+    "da nang": "Đà Nẵng",
+    "danang": "Đà Nẵng",
+
+    # ==================== HẢI PHÒNG ====================
+    "hải phòng (mới)": "Hải Phòng",
+    "hai phong (new)": "Hải Phòng",
+    "hải phòng": "Hải Phòng",
+    "hai phong": "Hải Phòng",
+    "haiphong": "Hải Phòng",
+    "hp": "Hải Phòng",
+
+    # ==================== CẦN THƠ ====================
+    "cần thơ (mới)": "Cần Thơ",
+    "can tho (new)": "Cần Thơ",
+    "cần thơ": "Cần Thơ",
+    "can tho": "Cần Thơ",
+    "cantho": "Cần Thơ",
+    "ct": "Cần Thơ",
+
+    # ==================== BÌNH DƯƠNG ====================
+    "bình dương (mới)": "Bình Dương",
+    "binh duong (new)": "Bình Dương",
+    "bình dương": "Bình Dương",
+    "binh duong": "Bình Dương",
+
+    # ==================== ĐỒNG NAI ====================
+    "đồng nai (mới)": "Đồng Nai",
+    "dong nai (new)": "Đồng Nai",
+    "đồng nai": "Đồng Nai",
+    "dong nai": "Đồng Nai",
+
+    # ==================== BÀ RỊA - VŨNG TÀU ====================
+    "bà rịa - vũng tàu": "Bà Rịa - Vũng Tàu",
+    "ba ria - vung tau": "Bà Rịa - Vũng Tàu",
+    "vũng tàu": "Bà Rịa - Vũng Tàu",
+    "vung tau": "Bà Rịa - Vũng Tàu",
+
+    # ==================== QUẢNG NINH ====================
+    "quảng ninh": "Quảng Ninh",
+    "quang ninh": "Quảng Ninh",
+
+    # ==================== KHÁNH HÒA ====================
+    "khánh hòa": "Khánh Hòa",
+    "khanh hoa": "Khánh Hòa",
+
+    # ==================== HƯNG YÊN ====================
+    "hưng yên": "Hưng Yên",
+    "hung yen": "Hưng Yên",
+
+    # ==================== BẮC NINH ====================
+    "bắc ninh": "Bắc Ninh",
+    "bac ninh": "Bắc Ninh",
+
+    # ==================== VĨNH PHÚC ====================
+    "vĩnh phúc": "Vĩnh Phúc",
+    "vinh phuc": "Vĩnh Phúc",
+
+    # ==================== HẢI DƯƠNG ====================
+    "hải dương": "Hải Dương",
+    "hai duong": "Hải Dương",
+
+    # ==================== THÁI NGUYÊN ====================
+    "thái nguyên": "Thái Nguyên",
+    "thai nguyen": "Thái Nguyên",
+
+    # ==================== PHÚ THỌ ====================
+    "phú thọ": "Phú Thọ",
+    "phu tho": "Phú Thọ",
+
+    # ==================== NGHỆ AN ====================
+    "nghệ an": "Nghệ An",
+    "nghe an": "Nghệ An",
+
+    # ==================== THANH HÓA ====================
+    "thanh hóa": "Thanh Hóa",
+    "thanh hoa": "Thanh Hóa",
 }
 
 # ==================== 4. QUY TẮC SENIORITY ====================
@@ -225,8 +311,18 @@ STOPWORDS_VI = {
     'nghi', 'thi', 'tri', 'quy', 'ngh', 'chuy', 'tuy', 'thu', 'gia', 'danh', 'huy', 'tra',
     'minh', 'vai', 'chung', 'trung', 'thao', 'thuy', 'tho', 'tinh', 'nghe', 'lao', 'nguy',
     'sau', 'khi', 'ngu', 'bao', 'sinh', 'nam', 'doanh', 'truy', 'duy', 'thanh', 'linh',
-    'kho', 'chieu', 'thu', 'ban', 'tranh', 'cung', 'tinh', 'chinh', 'nhu', 'viettel',
-    'cmc', 'fpt', 'vpbank', 'techcombank', 'vietinbank', 'agribank', 'bidv',
+    'kho', 'chieu', 'thu', 'ban', 'tranh', 'cung', 'tinh', 'chinh', 'nhu',
+}
+
+COMPANY_NAMES_TO_FILTER: Set[str] = {
+    'viettel',
+    'cmc',
+    'fpt',
+    'vpbank',
+    'techcombank',
+    'vietinbank',
+    'agribank',
+    'bidv',
 }
 # ==================== 7. HÀM TIỆN ÍCH CHO CONFIG ====================
 def get_role_from_title(title: str) -> Optional[str]:

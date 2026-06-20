@@ -6,7 +6,7 @@ import re
 from typing import List, Optional
 
 # Import stopwords và danh sách từ khóa từ config
-from ..utils.config import SKILL_KEYWORDS, STOPWORDS_VI, DOMAIN_KEYWORDS
+from ..utils.config import SKILL_KEYWORDS, STOPWORDS_VI, DOMAIN_KEYWORDS, COMPANY_NAMES_TO_FILTER
 
 
 def _make_pattern(keyword: str) -> str:
@@ -20,7 +20,7 @@ def _make_pattern(keyword: str) -> str:
        Lookaround không phụ thuộc vào loại ký tự nên stable hơn.
 
     2. Keyword nhiều từ ('power bi', 'machine learning', 'rest api'):
-       Split theo space, escape từng phần, nối bằng \s+ để bắt được
+       Split theo space, escape từng phần, nối bằng \\s+ để bắt được
        cả "Power  BI" hay "machine  learning" (nhiều space).
     """
     if " " in keyword:
@@ -44,6 +44,7 @@ def extract_skills(
     - Sử dụng stopwords tiếng Việt để loại bỏ nhiễu.
     - Chỉ giữ lại các token có chữ hoa hoặc số hoặc nằm trong skill_keywords.
     - Loại bỏ các kỹ năng trùng với DOMAIN_KEYWORDS.
+    - Loại bỏ các tên công ty.
     """
     # 1. Gộp văn bản
     texts = []
@@ -64,12 +65,14 @@ def extract_skills(
     token_pattern = re.compile(r'[a-z0-9]+(?:[-_][a-z0-9]+)*')
     tokens = token_pattern.findall(full_text)
 
-    # 3. Lọc token: bỏ stopwords tiếng Việt và token quá ngắn
+    # 3. Lọc token: bỏ stopwords tiếng Việt, tên công ty, và token quá ngắn
     filtered_tokens = []
     for t in tokens:
         if len(t) < 3:  # Bỏ token quá ngắn
             continue
         if t in STOPWORDS_VI:  # Bỏ stopwords tiếng Việt
+            continue
+        if t in COMPANY_NAMES_TO_FILTER:  # Bỏ tên công ty
             continue
         # Ưu tiên token có chữ hoa (tên riêng) hoặc số
         # Ở đây ta đã lower hết, nên kiểm tra token có thể là kỹ năng thực tế
@@ -100,16 +103,16 @@ def extract_skills(
     for i in range(len(words) - 1):
         gram = ' '.join(words[i:i+2])
         if gram in skill_keywords:
-            # Kiểm tra xem gram có chứa stopwords không
+            # Kiểm tra xem gram có chứa stopwords hoặc tên công ty không
             parts = gram.split()
-            if not any(p in STOPWORDS_VI for p in parts):
+            if not any(p in STOPWORDS_VI or p in COMPANY_NAMES_TO_FILTER for p in parts):
                 found_skills.add(gram)
     # Trigrams
     for i in range(len(words) - 2):
         gram = ' '.join(words[i:i+3])
         if gram in skill_keywords:
             parts = gram.split()
-            if not any(p in STOPWORDS_VI for p in parts):
+            if not any(p in STOPWORDS_VI or p in COMPANY_NAMES_TO_FILTER for p in parts):
                 found_skills.add(gram)
 
     # 5. Loại bỏ các kỹ năng trùng với DOMAIN_KEYWORDS (để tránh nhiễu)

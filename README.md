@@ -242,4 +242,5 @@ MIT
 
 ## 👤 Tác giả
 
-Tên bạn – Data Engineer / Data Scientist
+Tên bạn –Nguyễn Văn Toàn -Data/Analyst Engineer
+
