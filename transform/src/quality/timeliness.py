@@ -48,21 +48,23 @@ def check_timeliness(
             }
         }
 
-    # Chuyển đổi crawled_at sang datetime nếu cần
-    if not pd.api.types.is_datetime64_any_dtype(df['crawled_at']):
-        df['crawled_at'] = pd.to_datetime(df['crawled_at'])
+    # Tạo bản sao của cột crawled_at để xử lý (không ảnh hưởng df gốc)
+    crawled = df['crawled_at'].copy()
 
-    # Xử lý timezone: chuyển crawled_at về timezone-naive (UTC) để so sánh
-    # Nếu cột có timezone (ví dụ UTC), chuyển về naive (bỏ timezone)
-    if df['crawled_at'].dt.tz is not None:
-        df['crawled_at'] = df['crawled_at'].dt.tz_convert(None)
+    # Chuyển đổi sang datetime nếu cần
+    if not pd.api.types.is_datetime64_any_dtype(crawled):
+        crawled = pd.to_datetime(crawled)
+
+    # Xử lý timezone: chuyển về naive (bỏ timezone) để so sánh
+    if crawled.dt.tz is not None:
+        crawled = crawled.dt.tz_convert(None)
 
     # Lấy thời gian hiện tại ở UTC và chuyển về naive để so sánh
     now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
     threshold_date = now_utc - timedelta(days=days_threshold)
 
     # Đếm số job cũ (crawled_at < threshold_date)
-    stale_mask = df['crawled_at'] < threshold_date
+    stale_mask = crawled < threshold_date
     stale_count = stale_mask.sum()
     total = len(df)
     percentage = (stale_count / total) * 100 if total > 0 else 0.0
