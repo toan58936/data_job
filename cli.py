@@ -18,14 +18,12 @@ app = typer.Typer(
     add_completion=True,
 )
 
-# Đường dẫn thư mục dự án
 PROJECT_ROOT = Path(__file__).parent
 CRAWLER_DIR = PROJECT_ROOT / "crawlers"
 BRONZE_DIR = PROJECT_ROOT / "data" / "bronze"
 SILVER_DIR = PROJECT_ROOT / "data" / "silver"
 LOGS_DIR = PROJECT_ROOT / "logs"
 
-# File bronze
 BRONZE_FILES = {
     "all": BRONZE_DIR / "jobs_all.json",
     "detail": BRONZE_DIR / "jobs_detail.json",
@@ -43,13 +41,9 @@ def run_command(cmd: list, cwd: Optional[Path] = None, env: Optional[dict] = Non
 
 @app.command()
 def status():
-    """
-    Hiển thị trạng thái của dữ liệu hiện tại.
-    """
+    """Hiển thị trạng thái dữ liệu hiện tại."""
     typer.secho("===== TRẠNG THÁI HỆ THỐNG =====", fg=typer.colors.CYAN)
 
-    # Kiểm tra các file Bronze
-    typer.echo("Dữ liệu Bronze:")
     for name, path in BRONZE_FILES.items():
         if path.exists():
             size = path.stat().st_size
@@ -57,7 +51,6 @@ def status():
         else:
             typer.echo(f"  ❌ {path.name} (không tìm thấy)")
 
-    # Đếm số job trong jobs_all.json nếu có
     if BRONZE_FILES["all"].exists():
         try:
             with open(BRONZE_FILES["all"], "r", encoding="utf-8") as f:
@@ -66,7 +59,6 @@ def status():
         except:
             pass
 
-    # Kiểm tra file Silver
     silver_file = SILVER_DIR / "jobs_silver.parquet"
     if silver_file.exists():
         size = silver_file.stat().st_size
@@ -80,7 +72,6 @@ def status():
     else:
         typer.echo("\n❌ Silver Parquet chưa được tạo")
 
-    # Đường dẫn làm việc
     typer.echo(f"\nĐường dẫn làm việc:")
     typer.echo(f"  PROJECT_ROOT: {PROJECT_ROOT}")
 
@@ -92,9 +83,7 @@ def crawl(
     ),
     headless: bool = typer.Option(True, "--headless/--headed", help="Chạy headless hay hiện browser"),
 ):
-    """
-    Chạy crawler để thu thập dữ liệu từ TopCV.
-    """
+    """Chạy crawler để thu thập dữ liệu từ TopCV."""
     if task not in ["list", "detail", "text", "all"]:
         typer.secho(f"Tác vụ '{task}' không hợp lệ. Chọn: list, detail, text, all", fg=typer.colors.RED)
         raise typer.Exit(1)
@@ -135,59 +124,61 @@ def transform(
 ):
     """
     Chạy transform để chuẩn hóa dữ liệu từ Bronze lên Silver.
+    Hỗ trợ tham số --format để xuất ra CSV hoặc Parquet.
     """
-    typer.echo("Bắt đầu transform...")
-    cmd = ["uv", "run", "python", "-m", "transform.src.main"]
-    result = run_command(cmd, cwd=PROJECT_ROOT)
-    if result != 0:
-        typer.secho(f"Transform thất bại với mã lỗi {result}!", fg=typer.colors.RED)
-        raise typer.Exit(result)
+    typer.secho("Bắt đầu transform...", fg=typer.colors.YELLOW)
+    # Import trực tiếp pipeline để truyền format
+    from transform.src.orchestrator.pipeline import run_pipeline
+    exit_code = run_pipeline(output_format=format)
+    if exit_code != 0:
+        typer.secho(f"Transform thất bại với mã lỗi {exit_code}!", fg=typer.colors.RED)
+        raise typer.Exit(exit_code)
     typer.secho("Transform hoàn tất.", fg=typer.colors.GREEN)
 
 
 @app.command()
 def run(
     headless: bool = typer.Option(True, "--headless/--headed", help="Chế độ headless cho crawler"),
+    format: str = typer.Option("parquet", "--format", help="Định dạng output cho transform"),
 ):
     """
     Chạy toàn bộ pipeline: crawl all + transform.
-    Sử dụng script run_pipeline.ps1 để thực thi.
+    Không dùng PowerShell, gọi trực tiếp các lệnh crawl và transform.
     """
     typer.secho("===== BẮT ĐẦU PIPELINE =====", fg=typer.colors.CYAN)
-    script_path = PROJECT_ROOT / "run_pipeline.ps1"
-    if not script_path.exists():
-        typer.secho("❌ Không tìm thấy script run_pipeline.ps1", fg=typer.colors.RED)
-        raise typer.Exit(1)
 
-    # Nếu user chọn --headed, script hiện không hỗ trợ, nhưng có thể thông báo
+    # 1. Crawl all (gọi lại chính CLI với lệnh crawl)
+    typer.secho("\n[1/2] Đang chạy crawler...", fg=typer.colors.YELLOW)
+    cmd_crawl = [sys.executable, __file__, "crawl", "all"]
     if not headless:
-        typer.secho("⚠️ Script run_pipeline.ps1 hiện chỉ hỗ trợ headless mode. Bỏ qua --headed.", fg=typer.colors.YELLOW)
-
-    # Chạy script PowerShell
-    cmd = ["powershell", "-ExecutionPolicy", "Bypass", "-File", str(script_path)]
-    result = subprocess.run(cmd, cwd=PROJECT_ROOT)
+        cmd_crawl.append("--headed")
+    result = subprocess.run(cmd_crawl, cwd=PROJECT_ROOT)
     if result.returncode != 0:
-        typer.secho("❌ Pipeline thất bại!", fg=typer.colors.RED)
+        typer.secho("❌ Crawler thất bại!", fg=typer.colors.RED)
         raise typer.Exit(result.returncode)
-    typer.secho("✅ Pipeline hoàn tất!", fg=typer.colors.GREEN)
+
+    # 2. Transform
+    typer.secho("\n[2/2] Đang chạy transform...", fg=typer.colors.YELLOW)
+    cmd_transform = [sys.executable, __file__, "transform", "--format", format]
+    result = subprocess.run(cmd_transform, cwd=PROJECT_ROOT)
+    if result.returncode != 0:
+        typer.secho("❌ Transform thất bại!", fg=typer.colors.RED)
+        raise typer.Exit(result.returncode)
+
+    typer.secho("\n✅ Pipeline hoàn tất!", fg=typer.colors.GREEN)
 
 
 @app.command()
 def clean():
-    """
-    Xóa các file tạm (checkpoint, logs) và output cũ (nếu có).
-    """
+    """Xóa các file tạm (checkpoint, logs) và output cũ."""
     typer.secho("Cleaning...", fg=typer.colors.YELLOW)
-
     for f in BRONZE_DIR.glob("checkpoint*.json"):
         typer.echo(f"  Removing {f}")
         f.unlink()
-
     silver_file = SILVER_DIR / "jobs_silver.parquet"
     if silver_file.exists():
         typer.echo(f"  Removing {silver_file}")
         silver_file.unlink()
-
     typer.secho("Clean completed.", fg=typer.colors.GREEN)
 
 
@@ -223,9 +214,7 @@ def quality(
 
 @app.command()
 def shell():
-    """
-    Mở một shell với môi trường uv.
-    """
+    """Mở một shell với môi trường uv."""
     typer.echo("Mở shell với uv...")
     subprocess.run(["uv", "run", "bash"], cwd=PROJECT_ROOT)
 
