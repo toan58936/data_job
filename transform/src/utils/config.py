@@ -2,7 +2,7 @@
 config.py - Cấu hình cho tầng transform
 """
 import re
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 # ==================== 1. DANH SÁCH KỸ NĂNG ====================
 # Các từ khóa kỹ năng phổ biến trong ngành Data (Tiếng Anh và Tiếng Việt)
@@ -61,18 +61,42 @@ SKILL_KEYWORDS: List[str] = [
 # Danh sách các role chuẩn theo thứ tự ưu tiên (khớp đầu tiên)
 # Sử dụng \b để khớp chính xác từ (không bị match sub-word)
 ROLE_MAPPING: List[Tuple[str, str]] = [
+    # ===== CÁC ROLE CHUẨN NGÀNH DATA =====
     (r"\bdata engineer\b", "Data Engineer"),
     (r"\bdata analyst\b", "Data Analyst"),
     (r"\bdata scientist\b", "Data Scientist"),
     (r"\bbusiness intelligence\b|\bbi\b", "BI Analyst"),
     (r"\bmachine learning\b|\bml\b", "ML Engineer"),
     (r"\bai engineer\b|\bartificial intelligence\b", "AI Engineer"),
-    (r"\bdatabase engineer\b|\bdatabase administrator\b|\bdba\b", "Database Engineer"),
-    (r"\bdata architect\b", "Data Architect"),
+    
+    # ===== CÁC ROLE MỞ RỘNG (PHƯƠNG ÁN B) =====
+    # Các role quản lý dữ liệu
+    (r"\bdata\s*&\s*reporting\b", "Data Manager"),
+    (r"\bdata\s*manager\b", "Data Manager"),
+    (r"\breporting\s*manager\b", "Reporting Manager"),
+    
+    # Các role chuyên môn dữ liệu
+    (r"\bdata quality\b", "Data Quality Engineer"),
+    (r"\bdata\s*quality\s*engineer\b", "Data Quality Engineer"),
+    
+    # Các role tư vấn/giải pháp
+    (r"\bdata\s*solution\s*consultant\b", "Data Consultant"),
+    (r"\bdata\s*consultant\b", "Data Consultant"),
+    (r"\bdata\s*solution\s*architect\b", "Data Architect"),
+    
+    # Các role database
+    (r"\bdatabase\s*engineering\b", "Database Engineer"),
+    (r"\bdatabase\s*administrator\b|\bdba\b", "Database Engineer"),
+    
+    # Các role platform/kiến trúc
     (r"\bdata platform\b", "Data Platform Engineer"),
+    (r"\bdata\s*platform\s*engineer\b", "Data Platform Engineer"),
     (r"\betl developer\b", "ETL Developer"),
     (r"\bdata\s*ops\b", "DataOps Engineer"),
+    
+    # Các role phân tích nâng cao
     (r"\banalytics engineer\b", "Analytics Engineer"),
+    (r"\bdata\s*analytics\s*engineer\b", "Analytics Engineer"),
 ]
 
 # ==================== 3. MAPPING ĐỊA ĐIỂM ====================
@@ -205,13 +229,23 @@ STOPWORDS_VI = {
     'cmc', 'fpt', 'vpbank', 'techcombank', 'vietinbank', 'agribank', 'bidv',
 }
 # ==================== 7. HÀM TIỆN ÍCH CHO CONFIG ====================
-def get_role_from_title(title: str) -> str:
-    """Duyệt qua ROLE_MAPPING, trả về role chuẩn đầu tiên khớp, hoặc 'Data Engineer' nếu không khớp."""
+def get_role_from_title(title: str) -> Optional[str]:
+    """
+    Duyệt qua ROLE_MAPPING, trả về role chuẩn đầu tiên khớp.
+    Nếu không khớp bất kỳ pattern nào, trả về None.
+    
+    Args:
+        title: Tiêu đề job (có thể chứa nhiều từ khóa)
+    
+    Returns:
+        str: Role chuẩn nếu khớp pattern
+        None: Nếu không khớp bất kỳ pattern nào
+    """
     title_lower = title.lower()
     for pattern, role in ROLE_MAPPING:
         if re.search(pattern, title_lower):
             return role
-    return "Data Engineer"  # Mặc định
+    return None
 
 def get_seniority_from_title_and_exp(title: str, exp_min: int) -> str:
     """
