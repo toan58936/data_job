@@ -26,8 +26,7 @@ logs/
 .env
 .venv
 uv.lock
-pyproject.toml  # nếu bạn không muốn chia sẻ dependency (thường thì nên push)
-
+# pyproject.toml   <-- XÓA DÒNG NÀY
 # IDE
 .vscode/
 .idea/
@@ -37,3 +36,6 @@ pyproject.toml  # nếu bạn không muốn chia sẻ dependency (thường thì
 # OS
 Thumbs.db
 .DS_Store
+
+# Node modules của crawler
+crawlers/node_modules/

@@ -4,6 +4,7 @@ reader.py - Đọc và hợp nhất dữ liệu từ 3 file Bronze
 import json
 import os
 import logging
+import re
 from typing import List, Dict, Any, Optional, Set
 from pathlib import Path
 

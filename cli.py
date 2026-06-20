@@ -127,7 +127,6 @@ def transform(
     Hỗ trợ tham số --format để xuất ra CSV hoặc Parquet.
     """
     typer.secho("Bắt đầu transform...", fg=typer.colors.YELLOW)
-    # Import trực tiếp pipeline để truyền format
     from transform.src.orchestrator.pipeline import run_pipeline
     exit_code = run_pipeline(output_format=format)
     if exit_code != 0:

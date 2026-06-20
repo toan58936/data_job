@@ -212,7 +212,7 @@ Sau khi có dữ liệu Silver, bạn có thể chạy dashboard Streamlit:
 
 ```bash
 uv add streamlit plotly
-streamlit run app.py
+streamlit run dashboard/app.py
 ```
 
 Dashboard cung cấp:
