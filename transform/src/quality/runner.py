@@ -4,12 +4,12 @@ Chạy các stage, tổng hợp kết quả, gọi reporter và xác định exi
 """
 
 import sys
+import logging
 from pathlib import Path
 from datetime import datetime
 from typing import List, Optional, Dict, Any
 
 import pandas as pd
-import typer
 
 from .completeness import check_completeness
 from .validity import check_validity
@@ -19,6 +19,8 @@ from .timeliness import check_timeliness
 from .reporter import save_report, print_console
 from ..utils.config_loader import load_config
 
+# Tạo logger cho module
+logger = logging.getLogger(__name__)
 
 # Đăng ký các stage
 STAGE_REGISTRY = {
@@ -59,7 +61,7 @@ def run_quality(
         silver_file: Đường dẫn đến file Silver Parquet.
         output_dir: Thư mục lưu báo cáo (mặc định: data/quality).
         stages: Danh sách stage cần chạy (mặc định: tất cả).
-        silent: Nếu True, không in ra console (chỉ lưu file).
+        silent: Nếu True, chỉ log WARNING và ERROR (bỏ qua INFO).
         config: Dict chứa cấu hình quality (từ config.yaml). Nếu None, tự động load.
 
     Returns:
@@ -72,18 +74,18 @@ def run_quality(
 
     # 2. Kiểm tra file đầu vào
     if not silver_file.exists():
-        typer.secho(f"❌ Không tìm thấy file Silver: {silver_file}", fg=typer.colors.RED, err=True)
+        logger.error(f"Không tìm thấy file Silver: {silver_file}")
         return 1
 
     # 3. Đọc dữ liệu
     try:
         df = pd.read_parquet(silver_file)
     except Exception as e:
-        typer.secho(f"❌ Lỗi đọc Parquet: {e}", fg=typer.colors.RED, err=True)
+        logger.error(f"Lỗi đọc Parquet: {e}")
         return 1
 
     if df.empty:
-        typer.secho("⚠️ DataFrame rỗng, không có dữ liệu để kiểm tra.", fg=typer.colors.YELLOW)
+        logger.warning("DataFrame rỗng, không có dữ liệu để kiểm tra.")
         return 0
 
     # 4. Xác định danh sách stage cần chạy
@@ -95,7 +97,7 @@ def run_quality(
         # Lọc theo danh sách chỉ định, bỏ qua stage không tồn tại
         stages_to_run = [s for s in stages if s in STAGE_REGISTRY]
         if not stages_to_run:
-            typer.secho("⚠️ Không có stage hợp lệ nào được chỉ định.", fg=typer.colors.YELLOW)
+            logger.warning("Không có stage hợp lệ nào được chỉ định.")
             return 1
 
     # 5. Chuẩn bị các tham số cho từng stage từ config
@@ -105,15 +107,13 @@ def run_quality(
     error_threshold = comp_config.get('error_threshold', 0.80)
     field_error_thresholds = comp_config.get('field_overrides', {})
 
-    # Các stage khác có thể lấy ngưỡng nếu cần (hiện tại chưa hỗ trợ)
-
     # 6. Chạy từng stage
     results = {}
     has_error = False
     for stage_name in stages_to_run:
         func = STAGE_REGISTRY[stage_name]['func']
         if not silent:
-            typer.secho(f"\n🔄 Đang chạy stage: {stage_name}...", fg=typer.colors.CYAN)
+            logger.info(f"Đang chạy stage: {stage_name}...")
         try:
             # Truyền tham số đặc biệt cho completeness
             if stage_name == 'completeness':
@@ -132,15 +132,13 @@ def run_quality(
             for check_name, check_data in stage_result.items():
                 if check_data.get('status') == 'ERROR':
                     has_error = True
-                    if not silent:
-                        typer.secho(f"  ❌ {check_name}: ERROR", fg=typer.colors.RED)
+                    logger.error(f"{check_name}: ERROR")
                 elif check_data.get('status') == 'WARNING':
-                    if not silent:
-                        typer.secho(f"  ⚠️ {check_name}: WARNING", fg=typer.colors.YELLOW)
+                    logger.warning(f"{check_name}: WARNING")
             if not silent:
-                typer.secho(f"✅ Stage {stage_name} hoàn tất.", fg=typer.colors.GREEN)
+                logger.info(f"Stage {stage_name} hoàn tất.")
         except Exception as e:
-            typer.secho(f"❌ Lỗi khi chạy stage {stage_name}: {e}", fg=typer.colors.RED, err=True)
+            logger.error(f"Lỗi khi chạy stage {stage_name}: {e}")
             has_error = True
             # Vẫn tiếp tục các stage khác
 
@@ -155,8 +153,9 @@ def run_quality(
     # 8. Xuất báo cáo
     if output_dir is None:
         output_dir = Path(config.get('report_dir', 'data/quality'))
-    if not silent:
-        print_console(results, metadata)
+    # print_console vẫn sử dụng để in báo cáo tổng hợp (có thể giữ hoặc chuyển sang log)
+    # Tạm thời giữ print_console vì nó không dùng typer.
+    print_console(results, metadata)
     report_formats = config.get('report_formats', ['md', 'json'])
     save_report(results, output_dir, metadata, formats=report_formats)
 
