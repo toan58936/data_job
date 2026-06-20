@@ -31,25 +31,33 @@ def check_completeness(
     error_threshold: float = 0.80,
     field_error_thresholds: Dict[str, float] = None
 ) -> Dict[str, Dict[str, Any]]:
-    if field_error_thresholds is None:
-        field_error_thresholds = {}
     """
     Kiểm tra tính đầy đủ của các trường quan trọng.
-    Có thể điều chỉnh ngưỡng riêng cho từng trường bằng cách truyền
-    field_error_thresholds vào tham số (sẽ triển khai sau).
+
+    Tham số:
+        df: DataFrame đầu vào (Silver).
+        warning_threshold: Ngưỡng tỷ lệ để đạt WARNING (mặc định 95%).
+        error_threshold: Ngưỡng tỷ lệ để đạt ERROR (mặc định 80%).
+        field_error_thresholds: Dict cho phép override error_threshold cho từng trường.
+            Ví dụ: {'salary_min': 0.25, 'salary_max': 0.25}
     """
+    # Khởi tạo field_error_thresholds nếu None
+    if field_error_thresholds is None:
+        field_error_thresholds = {}
+
+    # Default overrides cho các trường đặc biệt (ưu tiên thấp hơn)
+    default_overrides = {
+        'salary_min': 0.25,
+        'salary_max': 0.25,
+    }
+
+    # Merge: default_overrides là nền, field_error_thresholds ghi đè (ưu tiên cao hơn)
+    resolved_overrides = {**default_overrides, **field_error_thresholds}
 
     if df.empty:
         return {}
 
     total_rows = len(df)
-
-    # Định nghĩa ngưỡng lỗi riêng cho từng trường (override error_threshold chung)
-    # Chỉ cần override cho những trường đặc biệt
-    field_error_thresholds = {
-        'salary_min': 0.25,   # 50% -> thay vì 80%
-        'salary_max': 0.25,
-    }
 
     fields = {
         'title': {
@@ -89,8 +97,8 @@ def check_completeness(
 
         percentage = (count / total_rows) * 100 if total_rows > 0 else 0.0
 
-        # Sử dụng ngưỡng lỗi riêng cho trường nếu có, nếu không dùng giá trị chung
-        current_error = field_error_thresholds.get(field, error_threshold)
+        # Sử dụng resolved_overrides thay vì field_error_thresholds gốc
+        current_error = resolved_overrides.get(field, error_threshold)
 
         if percentage >= warning_threshold * 100:
             status = 'OK'
