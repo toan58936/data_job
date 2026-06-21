@@ -25,7 +25,7 @@ from ..utils.config_loader import load_config
 
 # Cấu hình logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 
 def process_record(record: Dict[str, Any]) -> SilverJob:
