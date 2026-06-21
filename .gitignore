@@ -26,7 +26,7 @@ logs/
 .env
 .venv
 uv.lock
-# pyproject.toml   <-- XÓA DÒNG NÀY
+
 # IDE
 .vscode/
 .idea/
@@ -39,3 +39,6 @@ Thumbs.db
 
 # Node modules của crawler
 crawlers/node_modules/
+
+# Project-specific files (không cần push)
+future.md

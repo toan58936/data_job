@@ -64,7 +64,7 @@ topcv-data-engineer/
 ### Yêu cầu
 
 - **Node.js** (v18+)
-- **Python** (v3.10+)
+- **Python** (v3.12+)
 - **uv** (https://docs.astral.sh/uv/)
 - **Git**
 
@@ -128,7 +128,7 @@ uv run python cli.py crawl text
 uv run python cli.py crawl all
 
 # Chạy transform
-uv run python cli.py transform
+uv run python cli.py transform --format csv
 
 # Xem trạng thái dữ liệu
 uv run python cli.py status
