@@ -1,12 +1,11 @@
 """
-skills.py - Trích xuất kỹ năng (có lọc stopwords và nhiễu)
+skills.py - Trích xuất kỹ năng từ văn bản (sử dụng Regex tổng hợp)
 """
 
 import re
 from typing import List, Optional
 
-# Import stopwords và danh sách từ khóa từ config
-from ..utils.config import SKILL_KEYWORDS, STOPWORDS_VI, DOMAIN_KEYWORDS, COMPANY_NAMES_TO_FILTER
+from ..utils.config import SKILL_KEYWORDS, DOMAIN_KEYWORDS
 
 
 def _make_pattern(keyword: str) -> str:
@@ -39,12 +38,16 @@ def extract_skills(
 ) -> List[str]:
     """
     Trích xuất danh sách kỹ năng từ title, description, requirements.
+    Sử dụng regex để tìm kiếm trực tiếp các từ khóa kỹ năng trong văn bản.
 
-    Các cải tiến:
-    - Sử dụng stopwords tiếng Việt để loại bỏ nhiễu.
-    - Chỉ giữ lại các token có chữ hoa hoặc số hoặc nằm trong skill_keywords.
-    - Loại bỏ các kỹ năng trùng với DOMAIN_KEYWORDS.
-    - Loại bỏ các tên công ty.
+    Args:
+        title: Tiêu đề job
+        description: Mô tả công việc
+        requirements: Yêu cầu công việc
+        skill_keywords: Danh sách các từ khóa kỹ năng cần tìm
+
+    Returns:
+        List[str]: Danh sách kỹ năng đã tìm thấy (đã sắp xếp)
     """
     # 1. Gộp văn bản
     texts = []
@@ -60,64 +63,16 @@ def extract_skills(
 
     full_text = " ".join(texts).lower()
 
-    # 2. Tách từ và cụm từ (unigrams, bigrams, trigrams)
-    # Token pattern: chỉ giữ từ có chữ cái, số, dấu gạch nối
-    token_pattern = re.compile(r'[a-z0-9]+(?:[-_][a-z0-9]+)*')
-    tokens = token_pattern.findall(full_text)
-
-    # 3. Lọc token: bỏ stopwords tiếng Việt, tên công ty, và token quá ngắn
-    filtered_tokens = []
-    for t in tokens:
-        if len(t) < 3:  # Bỏ token quá ngắn
-            continue
-        if t in STOPWORDS_VI:  # Bỏ stopwords tiếng Việt
-            continue
-        if t in COMPANY_NAMES_TO_FILTER:  # Bỏ tên công ty
-            continue
-        # Ưu tiên token có chữ hoa (tên riêng) hoặc số
-        # Ở đây ta đã lower hết, nên kiểm tra token có thể là kỹ năng thực tế
-        # bằng cách kiểm tra token có nằm trong SKILL_KEYWORDS không
-        if t in skill_keywords:
-            filtered_tokens.append(t)
-        else:
-            # Nếu không nằm trong skill_keywords, kiểm tra có phải từ tiếng Anh không
-            # Giữ lại nếu token có chữ hoa hoặc số (đã lower hết nên không phân biệt)
-            # Ta giữ lại token nếu độ dài >= 4 và không bị loại bỏ ở trên
-            if len(t) >= 4:
-                filtered_tokens.append(t)
-
-    # 4. Trích xuất kỹ năng bằng regex với các từ khóa
-    # Đây là cách truyền thống, nhưng ta sẽ ưu tiên dùng filtered_tokens để giảm nhiễu
+    # 2. Duyệt từng từ khóa, tìm kiếm bằng regex pattern
     found_skills = set()
+    for keyword in skill_keywords:
+        pattern = _make_pattern(keyword)
+        if re.search(pattern, full_text):
+            found_skills.add(keyword)
 
-    # Cách 1: Dùng filtered_tokens để tìm kiếm trực tiếp trong các từ khóa
-    # Kiểm tra từng token có nằm trong skill_keywords không
-    for token in filtered_tokens:
-        if token in skill_keywords:
-            found_skills.add(token)
-
-    # Cách 2: Dùng regex để bắt các cụm từ nhiều từ (bigrams, trigrams)
-    # Tạo danh sách các cụm từ từ full_text
-    words = full_text.split()
-    # Bigrams
-    for i in range(len(words) - 1):
-        gram = ' '.join(words[i:i+2])
-        if gram in skill_keywords:
-            # Kiểm tra xem gram có chứa stopwords hoặc tên công ty không
-            parts = gram.split()
-            if not any(p in STOPWORDS_VI or p in COMPANY_NAMES_TO_FILTER for p in parts):
-                found_skills.add(gram)
-    # Trigrams
-    for i in range(len(words) - 2):
-        gram = ' '.join(words[i:i+3])
-        if gram in skill_keywords:
-            parts = gram.split()
-            if not any(p in STOPWORDS_VI or p in COMPANY_NAMES_TO_FILTER for p in parts):
-                found_skills.add(gram)
-
-    # 5. Loại bỏ các kỹ năng trùng với DOMAIN_KEYWORDS (để tránh nhiễu)
+    # 3. Loại bỏ các kỹ năng trùng với DOMAIN_KEYWORDS (để tránh nhiễu)
     domain_set = set(DOMAIN_KEYWORDS)
     found_skills = found_skills - domain_set
 
-    # 6. Sắp xếp kết quả
+    # 4. Sắp xếp kết quả
     return sorted(list(found_skills))
