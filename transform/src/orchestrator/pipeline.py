@@ -27,7 +27,6 @@ from ..utils.config_loader import load_config
 logger = logging.getLogger(__name__)
 
 
-
 def process_record(record: Dict[str, Any]) -> SilverJob:
     """
     Áp dụng tất cả các processor lên một bản ghi thô, trả về đối tượng SilverJob.
@@ -114,7 +113,8 @@ def process_record(record: Dict[str, Any]) -> SilverJob:
 def run_pipeline(
     bronze_dir: Optional[Path] = None,
     silver_file: Optional[Path] = None,
-    output_format: str = "parquet"
+    output_format: str = "parquet",
+    run_quality_checks: bool = True
 ) -> int:
     """
     Chạy toàn bộ pipeline Transform.
@@ -123,6 +123,7 @@ def run_pipeline(
         bronze_dir: Đường dẫn đến thư mục Bronze (mặc định: ./data/bronze)
         silver_file: Đường dẫn đến file Silver output (mặc định: ./data/silver/jobs_silver.parquet)
         output_format: "parquet" hoặc "csv"
+        run_quality: Nếu True, chạy Data Quality sau transform.
 
     Returns:
         int: 0 nếu thành công, khác 0 nếu lỗi.
@@ -189,34 +190,36 @@ def run_pipeline(
     # ============================================================
     # === TÍCH HỢP DATA QUALITY ===
     # ============================================================
-    try:
-        config = load_config()
-        quality_config = config.get('quality', {})
-        enabled_stages = quality_config.get('enabled_stages', [])
+    # ============================================================
+    # === TÍCH HỢP DATA QUALITY ===
+    # ============================================================
+    if run_quality_checks:
+        try:
+            config = load_config()
+            quality_config = config.get('quality', {})
+            enabled_stages = quality_config.get('enabled_stages', [])
 
-        if enabled_stages:
-            logger.info("Running Data Quality checks after transform...")
-            exit_code = run_quality(
-                silver_file=silver_file,
-                output_dir=Path(quality_config.get('report_dir', 'data/quality')),
-                stages=enabled_stages,
-                silent=False,
-                config=quality_config
-            )
-            if exit_code != 0 and quality_config.get('stop_on_error', True):
-                logger.error("Data Quality checks failed. Pipeline stopped.")
-                return exit_code
+            if enabled_stages:
+                logger.info("Running Data Quality checks after transform...")
+                exit_code = run_quality(
+                    silver_file=silver_file,
+                    output_dir=Path(quality_config.get('report_dir', 'data/quality')),
+                    stages=enabled_stages,
+                    silent=False,
+                    config=quality_config
+                )
+                if exit_code != 0 and quality_config.get('stop_on_error', True):
+                    logger.error("Data Quality checks failed. Pipeline stopped.")
+                    return exit_code
+                else:
+                    logger.info("Data Quality checks completed.")
             else:
-                logger.info("Data Quality checks completed.")
-        else:
-            logger.info("Data Quality checks are disabled in config. Skipping.")
-    except Exception as e:
-        logger.error(f"Error running Data Quality: {e}")
-        # Không dừng pipeline nếu quality lỗi (có thể ghi log và tiếp tục)
-        # Tùy chọn: có thể return 1 nếu muốn dừng khi quality lỗi
-        # Nhưng hiện tại chỉ log và tiếp tục
-        logger.warning("Data Quality encountered an error but pipeline continues.")
-
+                logger.info("Data Quality checks are disabled in config. Skipping.")
+        except Exception as e:
+            logger.error(f"Error running Data Quality: {e}")
+            logger.warning("Data Quality encountered an error but pipeline continues.")
+    else:
+        logger.info("Data Quality checks are disabled (run_quality_checks=False).")
     # ============================================================
     # Kết thúc pipeline
     logger.info("=" * 60)

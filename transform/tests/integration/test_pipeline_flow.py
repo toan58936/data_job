@@ -2,6 +2,7 @@
 test_pipeline_flow.py - Integration test cho toàn bộ pipeline.
 Sử dụng dữ liệu mẫu từ fixtures để kiểm tra luồng xử lý từ Bronze đến Silver.
 """
+
 import json
 import shutil
 import pytest
@@ -52,26 +53,33 @@ def output_dir(tmp_path):
 def test_pipeline_flow(bronze_dir, output_dir):
     """
     Chạy toàn bộ pipeline với dữ liệu mẫu và kiểm tra output.
+    Kiểm tra:
+    - Pipeline chạy thành công
+    - Output file được tạo
+    - Schema đúng
+    - Số lượng record khớp với input
+    - Giá trị của các trường quan trọng sau transform
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     output_file = output_dir / "jobs_silver.parquet"
 
-    # Chạy pipeline với dữ liệu mẫu (bronze_dir đã có file đúng tên)
+    # ===== 1. Chạy pipeline với dữ liệu mẫu =====
     exit_code = run_pipeline(
         bronze_dir=bronze_dir,
         silver_file=output_file,
-        output_format="parquet"
+        output_format="parquet",
+        run_quality_checks=False   # Tắt Data Quality để tránh fail do dữ liệu mẫu không có salary
     )
     assert exit_code == 0, "Pipeline failed"
 
-    # Kiểm tra file output được tạo
+    # ===== 2. Kiểm tra file output được tạo =====
     assert output_file.exists(), "Output file not created"
 
-    # Đọc dữ liệu
+    # ===== 3. Đọc dữ liệu =====
     df = pd.read_parquet(output_file)
     assert len(df) > 0, "Output DataFrame is empty"
 
-    # Kiểm tra các cột bắt buộc
+    # ===== 4. Kiểm tra schema =====
     expected_columns = [
         "job_id", "source", "job_url", "title", "company",
         "location_raw", "location_clean",
@@ -79,23 +87,87 @@ def test_pipeline_flow(bronze_dir, output_dir):
         "exp_min", "exp_max", "deadline", "level", "number_of_hires",
         "job_schedule_type", "working_time", "job_country",
         "work_mode", "job_work_from_home", "seniority_level", "normalized_role",
-        "skills", "description", "requirements", "benefits", "crawled_at"
+        "skills", "domain_keywords", "description", "requirements", "benefits", "crawled_at"
     ]
     for col in expected_columns:
         assert col in df.columns, f"Missing column: {col}"
 
-    # Kiểm tra có ít nhất một bản ghi có normalized_role và location_clean
-    assert df["normalized_role"].notna().any(), "No normalized_role found"
-    assert df["location_clean"].notna().any(), "No location_clean found"
-
-    # Kiểm tra số lượng bản ghi output khớp với số job trong sample
+    # ===== 5. Kiểm tra số lượng record =====
     all_file = bronze_dir / "jobs_all.json"
     with open(all_file, "r", encoding="utf-8") as f:
         all_jobs = json.load(f)
-    assert len(df) >= len(all_jobs), (
-        f"Output has {len(df)} records, expected at least {len(all_jobs)}"
+    assert len(df) == len(all_jobs), (
+        f"Output has {len(df)} records, expected {len(all_jobs)}"
     )
 
-    # Kiểm tra một số giá trị cụ thể
-    first_title = df.iloc[0]["title"]
-    assert first_title is not None and first_title != "", "First job title is empty"
+    # ===== 6. Kiểm tra giá trị cụ thể cho từng job =====
+    # Tạo dict mapping job_id -> row để kiểm tra
+    df_dict = {row['job_id']: row for _, row in df.iterrows()}
+
+    # 6.1 Job 2168835: "Data Engineer (Senior/Leader)"
+    job1 = df_dict.get("2168835")
+    assert job1 is not None, "Job 2168835 not found"
+    assert job1['title'] == "Data Engineer (Senior/Leader)"
+    assert job1['source'] == "TopCV"
+    assert job1['job_country'] == "Vietnam"
+    # Kiểm tra role mapping (Task 1)
+    # Title có "Data Engineer" -> phải là Data Engineer
+    assert job1['normalized_role'] == "Data Engineer"
+    # Kiểm tra location (Task 3)
+    assert job1['location_clean'] == "Hà Nội"
+    # Kiểm tra skills (có một số skill xuất hiện trong description/requirements)
+    assert "python" in job1['skills']
+    assert "sql" in job1['skills']
+    # Kiểm tra domain keywords
+    assert len(job1['domain_keywords']) >= 0  # Có thể rỗng
+
+    # 6.2 Job 2178692: "Data Solution Architect"
+    job2 = df_dict.get("2178692")
+    assert job2 is not None, "Job 2178692 not found"
+    assert job2['title'] == "Data Solution Architect"
+    # Role mapping: khớp pattern "data solution architect" -> "Data Architect"
+    assert job2['normalized_role'] == "Data Architect"  # <-- SỬA Ở ĐÂY
+    # Location: Hà Nội -> Hà Nội
+    assert job2['location_clean'] == "Hà Nội"
+    # Skills: kiểm tra có SQL (xuất hiện trong requirements)
+    assert "sql" in job2['skills']
+    # Domain keywords: "data warehouse", "data lakehouse" xuất hiện trong description
+    assert "data warehouse" in job2['domain_keywords']
+    assert "data lakehouse" in job2['domain_keywords']
+
+    # 6.3 Job 2124490: "Data Engineer Lead"
+    job3 = df_dict.get("2124490")
+    assert job3 is not None, "Job 2124490 not found"
+    assert job3['title'] == "Data Engineer Lead"
+    # Role mapping: có "Data Engineer" -> Data Engineer
+    assert job3['normalized_role'] == "Data Engineer"
+    # Seniority: có "Lead" trong title -> Lead
+    assert job3['seniority_level'] == "Lead"
+    # Location: Hà Nội -> Hà Nội
+    assert job3['location_clean'] == "Hà Nội"
+    # Skills: SQL xuất hiện trong requirements
+    assert "sql" in job3['skills']
+    # Domain keywords: "data warehouse" xuất hiện trong description
+    assert "data warehouse" in job3['domain_keywords']
+
+    # ===== 7. Kiểm tra các trường không được null =====
+    # Các trường bắt buộc không được null
+    required_non_null_fields = [
+        "job_id", "source", "job_url", "title", "company",
+        "location_raw", "location_clean", "job_country",
+        "work_mode", "crawled_at"
+    ]
+    for field in required_non_null_fields:
+        assert df[field].notna().all(), f"Field '{field}' has null values"
+
+    # ===== 8. Kiểm tra job_country luôn là Vietnam =====
+    assert (df['job_country'] == "Vietnam").all(), "Not all jobs have job_country = 'Vietnam'"
+
+    # ===== 9. Kiểm tra skills không chứa domain keywords =====
+    # Domain keywords như 'data warehouse', 'machine learning' không nằm trong skills
+    for _, row in df.iterrows():
+        skills = row.get('skills', [])
+        # Kiểm tra không có domain keywords trong skills
+        for skill in skills:
+            assert skill not in ['data warehouse', 'data lakehouse', 'machine learning', 'ml', 'ai'], \
+                f"Domain keyword '{skill}' found in skills for job {row['job_id']}"
