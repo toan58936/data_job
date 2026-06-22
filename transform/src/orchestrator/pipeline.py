@@ -23,6 +23,9 @@ from transform.src.schemas.silver_schema import SilverJob
 from ..quality.runner import run_quality
 from ..utils.config_loader import load_config
 
+# === TÍCH HỢP GOLD ===
+from transform.src.gold.gold_builder import build_gold
+
 # Cấu hình logging
 logger = logging.getLogger(__name__)
 
@@ -114,7 +117,8 @@ def run_pipeline(
     bronze_dir: Optional[Path] = None,
     silver_file: Optional[Path] = None,
     output_format: str = "parquet",
-    run_quality_checks: bool = True
+    run_quality_checks: bool = True,
+    run_gold: bool = True
 ) -> int:
     """
     Chạy toàn bộ pipeline Transform.
@@ -123,7 +127,8 @@ def run_pipeline(
         bronze_dir: Đường dẫn đến thư mục Bronze (mặc định: ./data/bronze)
         silver_file: Đường dẫn đến file Silver output (mặc định: ./data/silver/jobs_silver.parquet)
         output_format: "parquet" hoặc "csv"
-        run_quality: Nếu True, chạy Data Quality sau transform.
+        run_quality_checks: Nếu True, chạy Data Quality sau transform.
+        run_gold: Nếu True, chạy Gold builder sau transform.
 
     Returns:
         int: 0 nếu thành công, khác 0 nếu lỗi.
@@ -190,9 +195,6 @@ def run_pipeline(
     # ============================================================
     # === TÍCH HỢP DATA QUALITY ===
     # ============================================================
-    # ============================================================
-    # === TÍCH HỢP DATA QUALITY ===
-    # ============================================================
     if run_quality_checks:
         try:
             config = load_config()
@@ -220,6 +222,31 @@ def run_pipeline(
             logger.warning("Data Quality encountered an error but pipeline continues.")
     else:
         logger.info("Data Quality checks are disabled (run_quality_checks=False).")
+
+    # ============================================================
+    # === TÍCH HỢP GOLD ===
+    # ============================================================
+    if run_gold:
+        try:
+            config = load_config()
+            gold_config = config.get('gold', {})
+            if gold_config.get('enabled', True):
+                gold_dir = Path(gold_config.get('output_dir', 'data/gold'))
+                logger.info(f"Building Gold layer at {gold_dir}...")
+                exit_code = build_gold(silver_file, gold_dir)
+                if exit_code != 0:
+                    logger.error("Gold build failed. Check logs for details.")
+                    logger.warning("Gold layer was not built successfully, but pipeline continues.")
+                else:
+                    logger.info("Gold layer built successfully.")
+            else:
+                logger.info("Gold builder is disabled in config. Skipping.")
+        except Exception as e:
+            logger.error(f"Error building Gold: {e}")
+            logger.warning("Gold layer encountered an error but pipeline continues.")
+    else:
+        logger.info("Gold builder is disabled (run_gold=False).")
+
     # ============================================================
     # Kết thúc pipeline
     logger.info("=" * 60)

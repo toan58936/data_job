@@ -4,6 +4,9 @@ pipeline:
   silver_dir: "data/silver"
   gold_dir: "data/gold"
   output_format: "parquet"
+gold:
+  enabled: true
+  output_dir: "data/gold"
 
 quality:
   completeness:

@@ -10,5 +10,4 @@ STT	Task	File	Mô tả	Ưu tiên	Effort
 6	builder.py – điều phối xây dựng Gold	transform/src/gold/builder.py	Đọc Silver, gọi các hàm trên, ghi Parquet	Cao	1.5 giờ
 7	Tích hợp Gold vào pipeline.py	transform/src/orchestrator/pipeline.py	Gọi build_gold() sau transform, có config enable/disable	Cao	30 phút
 8	CLI command gold	cli.py	Thêm lệnh uv run python cli.py gold để rebuild riêng	Trung bình	30 phút
-9	Cập nhật Dashboard đọc từ Gold	dashboard/app.py	Thay đổi logic đọc từ Gold thay vì Silver	Cao	2 giờ
 10	Cập nhật config.yaml và kiểm thử	config.yaml	Thêm section gold với cấu hình	Thấp	15 phút

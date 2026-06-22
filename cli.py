@@ -121,6 +121,8 @@ def crawl(
 @app.command()
 def transform(
     format: str = typer.Option("parquet", "--format", help="Định dạng output: parquet hoặc csv"),
+    no_gold: bool = typer.Option(False, "--no-gold", help="Không xây dựng Gold layer"),
+    no_quality: bool = typer.Option(False, "--no-quality", help="Không chạy Data Quality"),
 ):
     """
     Chạy transform để chuẩn hóa dữ liệu từ Bronze lên Silver.
@@ -128,7 +130,11 @@ def transform(
     """
     typer.secho("Bắt đầu transform...", fg=typer.colors.YELLOW)
     from transform.src.orchestrator.pipeline import run_pipeline
-    exit_code = run_pipeline(output_format=format)
+    exit_code = run_pipeline(
+        output_format=format,
+        run_quality_checks=not no_quality,
+        run_gold=not no_gold
+    )
     if exit_code != 0:
         typer.secho(f"Transform thất bại với mã lỗi {exit_code}!", fg=typer.colors.RED)
         raise typer.Exit(exit_code)
@@ -139,6 +145,8 @@ def transform(
 def run(
     headless: bool = typer.Option(True, "--headless/--headed", help="Chế độ headless cho crawler"),
     format: str = typer.Option("parquet", "--format", help="Định dạng output cho transform"),
+    no_gold: bool = typer.Option(False, "--no-gold", help="Không xây dựng Gold layer"),
+    no_quality: bool = typer.Option(False, "--no-quality", help="Không chạy Data Quality"),
 ):
     """
     Chạy toàn bộ pipeline: crawl all + transform.
@@ -146,7 +154,7 @@ def run(
     """
     typer.secho("===== BẮT ĐẦU PIPELINE =====", fg=typer.colors.CYAN)
 
-    # 1. Crawl all (gọi lại chính CLI với lệnh crawl)
+    # 1. Crawl all
     typer.secho("\n[1/2] Đang chạy crawler...", fg=typer.colors.YELLOW)
     cmd_crawl = [sys.executable, __file__, "crawl", "all"]
     if not headless:
@@ -159,12 +167,43 @@ def run(
     # 2. Transform
     typer.secho("\n[2/2] Đang chạy transform...", fg=typer.colors.YELLOW)
     cmd_transform = [sys.executable, __file__, "transform", "--format", format]
+    if no_gold:
+        cmd_transform.append("--no-gold")
+    if no_quality:
+        cmd_transform.append("--no-quality")
     result = subprocess.run(cmd_transform, cwd=PROJECT_ROOT)
     if result.returncode != 0:
         typer.secho("❌ Transform thất bại!", fg=typer.colors.RED)
         raise typer.Exit(result.returncode)
 
     typer.secho("\n✅ Pipeline hoàn tất!", fg=typer.colors.GREEN)
+
+
+@app.command()
+def gold(
+    silver_file: Optional[Path] = typer.Option(None, "--silver-file", help="Đường dẫn đến file Silver Parquet"),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Thư mục lưu Gold"),
+):
+    """
+    Xây dựng Gold Layer từ Silver.
+    """
+    from transform.src.gold.gold_builder import build_gold
+
+    if silver_file is None:
+        silver_file = SILVER_DIR / "jobs_silver.parquet"
+    if output_dir is None:
+        output_dir = PROJECT_ROOT / "data" / "gold"
+
+    if not silver_file.exists():
+        typer.secho(f"❌ File Silver không tồn tại: {silver_file}", fg=typer.colors.RED)
+        raise typer.Exit(1)
+
+    typer.secho(f"📦 Building Gold from {silver_file} to {output_dir}...", fg=typer.colors.CYAN)
+    exit_code = build_gold(silver_file, output_dir)
+    if exit_code != 0:
+        typer.secho("❌ Gold build failed!", fg=typer.colors.RED)
+        raise typer.Exit(exit_code)
+    typer.secho("✅ Gold build completed!", fg=typer.colors.GREEN)
 
 
 @app.command()

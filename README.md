@@ -45,6 +45,7 @@ topcv-data-engineer/
 ├── data/
 │   ├── bronze/                 # Dữ liệu thô JSON (từ crawler)
 │   ├── silver/                 # Dữ liệu chuẩn hóa Parquet
+|   ├── gold/                   # dữ liệu insign
 │   └── quality/                # Báo cáo chất lượng dữ liệu
 ├── logs/                       # Log của crawler và transform
 ├── notebooks/                  # Jupyter notebooks cho phân tích
@@ -130,6 +131,9 @@ uv run python cli.py crawl all
 # Chạy transform
 uv run python cli.py transform --format csv
 
+# Xây dựng Gold Layer từ Silver
+uv run python cli.py gold
+
 # Xem trạng thái dữ liệu
 uv run python cli.py status
 
@@ -212,7 +216,7 @@ Sau khi có dữ liệu Silver, bạn có thể chạy dashboard Streamlit:
 
 ```bash
 uv add streamlit plotly
-streamlit run dashboard/app.py
+uv run streamlit run dashboard/app.py
 ```
 
 Dashboard cung cấp:

@@ -68,7 +68,8 @@ def test_pipeline_flow(bronze_dir, output_dir):
         bronze_dir=bronze_dir,
         silver_file=output_file,
         output_format="parquet",
-        run_quality_checks=False   # Tắt Data Quality để tránh fail do dữ liệu mẫu không có salary
+        run_quality_checks=False,
+        run_gold=False   # Tắt Data Quality để tránh fail do dữ liệu mẫu không có salary
     )
     assert exit_code == 0, "Pipeline failed"
 
@@ -171,3 +172,19 @@ def test_pipeline_flow(bronze_dir, output_dir):
         for skill in skills:
             assert skill not in ['data warehouse', 'data lakehouse', 'machine learning', 'ml', 'ai'], \
                 f"Domain keyword '{skill}' found in skills for job {row['job_id']}"
+
+    # ===== 10. Kiểm tra Gold layer =====
+    gold_dir = output_dir.parent / "gold"
+    gold_files = [
+        "metrics.parquet",
+        "salary_by_role.parquet",
+        "salary_by_seniority.parquet",
+        "heatmap_salary.parquet",
+        "top_skills.parquet",
+        "skills_by_role.parquet",
+        "location_distribution.parquet",
+        "work_mode_distribution.parquet",
+        "top_domains.parquet"
+    ]
+    for f in gold_files:
+        assert (gold_dir / f).exists(), f"Gold file {f} not created"
