@@ -119,23 +119,31 @@ Cấu hình pipeline và quality có thể chỉnh sửa trong `config.yaml`:
 # Xem trợ giúp
 uv run python cli.py --help
 
-# Chạy toàn bộ pipeline
-uv run python cli.py run
+# Pipeline đầy đủ với tất cả role
+uv run python cli.py run --roles all
+
+# Pipeline với một vài role
+uv run python cli.py run --roles data-engineer,data-analyst
+
+# Tắt quality hoặc gold nếu không muốn chạy
+uv run python cli.py run --roles all --no-quality --no-gold
 
 # Chạy riêng từng crawler
-uv run python cli.py crawl list
+uv run python cli.py crawl list --roles all # Crawl tất cả role (đọc từ config.yaml)
+uv run python cli.py crawl list --roles data-analyst,data-scientist # Crawl một số role cụ thể
+uv run python cli.py crawl list --roles all --headed # Crawl với chế độ hiện browser (không headless)
 uv run python cli.py crawl detail
 uv run python cli.py crawl text
 uv run python cli.py crawl all
 
 # Chạy transform
+uv run python cli.py transform --format parquet
+# hoặc xuất CSV
 uv run python cli.py transform --format csv
 
 # Xây dựng Gold Layer từ Silver
 uv run python cli.py gold
 
-# Xem trạng thái dữ liệu
-uv run python cli.py status
 
 # Xóa file checkpoint và Silver cũ
 uv run python cli.py clean
@@ -145,8 +153,10 @@ uv run python cli.py quality
 
 # Chạy Data Quality với config tùy chỉnh
 uv run python cli.py quality --config config.yaml
-```
 
+# Xem trạng thái dữ liệu
+uv run python cli.py status
+```
 ### 🔹 Cách 3: Makefile
 
 ```bash

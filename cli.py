@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Optional
 
 import typer
+import yaml
 
 app = typer.Typer(
     name="data-pipeline",
@@ -37,6 +38,28 @@ def run_command(cmd: list, cwd: Optional[Path] = None, env: Optional[dict] = Non
     typer.echo(f"Running: {' '.join(cmd)}")
     result = subprocess.run(cmd, cwd=cwd, env=full_env)
     return result.returncode
+
+
+def load_roles_from_config() -> list:
+    """Đọc danh sách role từ config.yaml. Fallback nếu không có."""
+    config_path = PROJECT_ROOT / "config.yaml"
+    default_roles = [
+        'data-engineer',
+        'data-analyst',
+        'data-scientist',
+        'business-intelligence'
+    ]
+    if not config_path.exists():
+        return default_roles
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
+        roles = config.get('crawler', {}).get('roles')
+        if isinstance(roles, list) and roles:
+            return roles
+    except Exception:
+        pass
+    return default_roles
 
 
 @app.command()
@@ -82,38 +105,87 @@ def crawl(
         "all", help="Tác vụ crawl: list, detail, text, hoặc all (mặc định)"
     ),
     headless: bool = typer.Option(True, "--headless/--headed", help="Chạy headless hay hiện browser"),
+    roles: str = typer.Option("all", "--roles", help="Danh sách role: 'all' hoặc 'role1,role2'"),
 ):
-    """Chạy crawler để thu thập dữ liệu từ TopCV."""
+    """
+    Chạy crawler để thu thập dữ liệu từ TopCV.
+    """
     if task not in ["list", "detail", "text", "all"]:
         typer.secho(f"Tác vụ '{task}' không hợp lệ. Chọn: list, detail, text, all", fg=typer.colors.RED)
         raise typer.Exit(1)
 
-    script_map = {
-        "list": "topcv-list-crawler.js",
-        "detail": "topcv-detail-crawler.js",
-        "text": "topcv-text-crawler.js",
-    }
+    # ===== LIST CRAWLER =====
+    if task in ["list", "all"]:
+        # Xác định danh sách role cụ thể
+        if roles == "all":
+            role_list = load_roles_from_config()
+        else:
+            role_list = [r.strip() for r in roles.split(',') if r.strip()]
+        if not role_list:
+            typer.secho("❌ Không có role nào để crawl!", fg=typer.colors.RED)
+            raise typer.Exit(1)
 
-    if task == "all":
-        tasks = ["list", "detail", "text"]
-    else:
-        tasks = [task]
+        roles_arg = ",".join(role_list)
+        typer.secho(f"📋 Crawling list for roles: {role_list}", fg=typer.colors.CYAN)
 
-    for t in tasks:
-        script = script_map[t]
-        script_path = CRAWLER_DIR / "src" / script
+        # Sử dụng multi-role crawler (ưu tiên)
+        script_path_multi = CRAWLER_DIR / "src" / "list-crawler-multi.js"
+        if script_path_multi.exists():
+            cmd = ["uv", "run", "node", str(script_path_multi), "--roles", roles_arg]
+            env = {"HEADLESS": "true" if headless else "false"}
+            result = run_command(cmd, cwd=CRAWLER_DIR, env=env)
+            if result != 0:
+                typer.secho(f"Multi-role crawler thất bại với mã lỗi {result}!", fg=typer.colors.RED)
+                typer.secho("⚠️ Một số role thất bại. Xem log để biết chi tiết.", fg=typer.colors.YELLOW)
+                raise typer.Exit(result)
+            typer.secho("Multi-role crawler hoàn tất.", fg=typer.colors.GREEN)
+        else:
+            # Fallback: dùng legacy crawler (chỉ 1 role)
+            if len(role_list) == 1:
+                script_path = CRAWLER_DIR / "src" / "topcv-list-crawler.js"
+                if not script_path.exists():
+                    typer.secho(f"File {script_path} không tồn tại!", fg=typer.colors.RED)
+                    raise typer.Exit(1)
+                cmd = ["uv", "run", "node", str(script_path)]
+                env = {"HEADLESS": "true" if headless else "false"}
+                result = run_command(cmd, cwd=CRAWLER_DIR, env=env)
+                if result != 0:
+                    typer.secho(f"Crawler list thất bại với mã lỗi {result}!", fg=typer.colors.RED)
+                    raise typer.Exit(result)
+                typer.secho("Legacy crawler hoàn tất.", fg=typer.colors.GREEN)
+            else:
+                typer.secho("⚠️ Legacy crawler chỉ hỗ trợ 1 role. Cần multi-role crawler.", fg=typer.colors.RED)
+                raise typer.Exit(1)
+
+    # ===== DETAIL CRAWLER =====
+    if task in ["detail", "all"]:
+        script_path = CRAWLER_DIR / "src" / "topcv-detail-crawler.js"
         if not script_path.exists():
             typer.secho(f"File {script_path} không tồn tại!", fg=typer.colors.RED)
             raise typer.Exit(1)
-
         cmd = ["uv", "run", "node", str(script_path)]
         env = {"HEADLESS": "true" if headless else "false"}
-        typer.echo(f"Chạy crawler {t}...")
+        typer.echo("Chạy crawler detail...")
         result = run_command(cmd, cwd=CRAWLER_DIR, env=env)
         if result != 0:
-            typer.secho(f"Crawler {t} thất bại với mã lỗi {result}!", fg=typer.colors.RED)
+            typer.secho(f"Crawler detail thất bại với mã lỗi {result}!", fg=typer.colors.RED)
             raise typer.Exit(result)
-        typer.secho(f"Crawler {t} hoàn tất.", fg=typer.colors.GREEN)
+        typer.secho("Crawler detail hoàn tất.", fg=typer.colors.GREEN)
+
+    # ===== TEXT CRAWLER =====
+    if task in ["text", "all"]:
+        script_path = CRAWLER_DIR / "src" / "topcv-text-crawler.js"
+        if not script_path.exists():
+            typer.secho(f"File {script_path} không tồn tại!", fg=typer.colors.RED)
+            raise typer.Exit(1)
+        cmd = ["uv", "run", "node", str(script_path)]
+        env = {"HEADLESS": "true" if headless else "false"}
+        typer.echo("Chạy crawler text...")
+        result = run_command(cmd, cwd=CRAWLER_DIR, env=env)
+        if result != 0:
+            typer.secho(f"Crawler text thất bại với mã lỗi {result}!", fg=typer.colors.RED)
+            raise typer.Exit(result)
+        typer.secho("Crawler text hoàn tất.", fg=typer.colors.GREEN)
 
     typer.secho("Hoàn tất tất cả các tác vụ crawl.", fg=typer.colors.GREEN)
 
@@ -147,18 +219,20 @@ def run(
     format: str = typer.Option("parquet", "--format", help="Định dạng output cho transform"),
     no_gold: bool = typer.Option(False, "--no-gold", help="Không xây dựng Gold layer"),
     no_quality: bool = typer.Option(False, "--no-quality", help="Không chạy Data Quality"),
+    roles: str = typer.Option("all", "--roles", help="Danh sách role: 'all' hoặc 'role1,role2'"),
 ):
     """
     Chạy toàn bộ pipeline: crawl all + transform.
-    Không dùng PowerShell, gọi trực tiếp các lệnh crawl và transform.
     """
     typer.secho("===== BẮT ĐẦU PIPELINE =====", fg=typer.colors.CYAN)
 
-    # 1. Crawl all
+    # 1. Crawl (truyền roles)
     typer.secho("\n[1/2] Đang chạy crawler...", fg=typer.colors.YELLOW)
     cmd_crawl = [sys.executable, __file__, "crawl", "all"]
     if not headless:
         cmd_crawl.append("--headed")
+    if roles:
+        cmd_crawl.extend(["--roles", roles])
     result = subprocess.run(cmd_crawl, cwd=PROJECT_ROOT)
     if result.returncode != 0:
         typer.secho("❌ Crawler thất bại!", fg=typer.colors.RED)

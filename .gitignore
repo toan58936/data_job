@@ -38,7 +38,7 @@ Thumbs.db
 .DS_Store
 
 # Node modules của crawler
-crawlers/node_modules/
+D:\topcv-data-engineer\crawlers\node_modules
 
 # Project-specific files (không cần push)
-future.md
+D:\topcv-data-engineer\future.md

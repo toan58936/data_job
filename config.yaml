@@ -4,6 +4,7 @@ pipeline:
   silver_dir: "data/silver"
   gold_dir: "data/gold"
   output_format: "parquet"
+
 gold:
   enabled: true
   output_dir: "data/gold"
@@ -29,3 +30,15 @@ quality:
     - json
   report_dir: "data/quality"
   stop_on_error: true
+
+# ===== THÊM PHẦN NÀY =====
+crawler:
+  roles:
+    - data-engineer
+    - data-analyst
+    - data-scientist
+    - business-intelligence
+    # Bạn có thể thêm/bớt role ở đây
+    # - machine-learning
+    # - ai-engineer
+    # - analytics-engineer
