@@ -242,9 +242,8 @@ Dashboard cung cấp:
 ## 🛠️ Phát triển và mở rộng
 
 - **Thêm nguồn dữ liệu mới**: Tạo crawler riêng cho ITviec, VietnamWorks, LinkedIn...
-- **Nâng cấp extract skills**: Sử dụng NLP (spaCy, NER) để trích xuất kỹ năng chính xác hơn.
-- **Thêm stage kiểm tra Bronze**: Kiểm tra dữ liệu thô trước khi transform.
-- **Tầng Gold**: Tạo các bảng tổng hợp (lương trung bình theo role, top skills, phân bố địa điểm) phục vụ dashboard.
+
+
 
 ---
 
