@@ -1,0 +1,915 @@
+[
+  {
+    "job_id": "itviec_senior-data-engineer-ai-english-hrs-group-3800",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-data-engineer-ai-english-hrs-group-3800?lab_feature=preview_jd_page",
+    "job_title": "Senior Data Engineer (AI, English)",
+    "company_name": "HRS Group",
+    "location": "Ho Chi Minh",
+    "work_model": "Hybrid",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "Data modeling",
+      "SQL",
+      "Data Warehousing",
+      "AI",
+      "English"
+    ],
+    "posted_text": "Posted\n17 hours ago",
+    "collected_at": "2026-06-25T01:16:46.653Z"
+  },
+  {
+    "job_id": "itviec_data-engineer-vic-viettel-group-5243",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/data-engineer-vic-viettel-group-5243?lab_feature=preview_jd_page",
+    "job_title": "Data Engineer - VIC",
+    "company_name": "Viettel Group",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "Hadoop",
+      "Spark",
+      "SQL"
+    ],
+    "posted_text": "Posted\n2 days ago",
+    "collected_at": "2026-06-25T01:16:46.654Z"
+  },
+  {
+    "job_id": "itviec_senior-data-engineer-azure-dbt-microsoft-fabric-huenx-vietnam-1510",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-data-engineer-azure-dbt-microsoft-fabric-huenx-vietnam-1510?lab_feature=preview_jd_page",
+    "job_title": "Senior Data Engineer (Azure, dbt, Microsoft Fabric)",
+    "company_name": "HUENX VIETNAM",
+    "location": "Ho Chi Minh",
+    "work_model": "Remote",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "AI",
+      "SQL",
+      "ETL",
+      "DBT",
+      "Azure"
+    ],
+    "posted_text": "Posted\n6 days ago",
+    "collected_at": "2026-06-25T01:16:46.655Z"
+  },
+  {
+    "job_id": "itviec_senior-data-engineer-sql-data-warehousing-etl-bss-group-4606",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-data-engineer-sql-data-warehousing-etl-bss-group-4606?lab_feature=preview_jd_page",
+    "job_title": "Middle Data Engineer ( SQL/Data Warehousing/Python )",
+    "company_name": "BSS Group",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "Business Analysis",
+      "Data modeling",
+      "Data Warehousing",
+      "Python",
+      "SQL"
+    ],
+    "posted_text": "Posted\n6 days ago",
+    "collected_at": "2026-06-25T01:16:46.656Z"
+  },
+  {
+    "job_id": "itviec_remote-data-engineer-ai-data-platform-japan-python-salesnow-co-ltd-2134",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/remote-data-engineer-ai-data-platform-japan-python-salesnow-co-ltd-2134?lab_feature=preview_jd_page",
+    "job_title": "Remote Data Engineer - AI Data Platform Japan (Python)",
+    "company_name": "SalesNow Co., Ltd.",
+    "location": "Ha Noi - Da Nang - Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Python",
+      "Data Engineer",
+      "AI",
+      "AWS",
+      "SQL",
+      "JSON"
+    ],
+    "posted_text": "Posted\n6 days ago",
+    "collected_at": "2026-06-25T01:16:46.656Z"
+  },
+  {
+    "job_id": "itviec_ho-data-lake-manager-big-data-engineer-ngan-hang-a-chau-acb-5715",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/ho-data-lake-manager-big-data-engineer-ngan-hang-a-chau-acb-5715?lab_feature=preview_jd_page",
+    "job_title": "HO - Data Lake Manager (Big Data Engineer)",
+    "company_name": "Ngân Hàng Á Châu | ACB",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Big Data",
+      "Business Analysis",
+      "Data Engineer",
+      "Apache Spark",
+      "Data mining",
+      "Hadoop"
+    ],
+    "posted_text": "Posted\n7 days ago",
+    "collected_at": "2026-06-25T01:16:46.656Z"
+  },
+  {
+    "job_id": "itviec_senior-data-engineer-trustify-technology-4307",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-data-engineer-trustify-technology-4307?lab_feature=preview_jd_page",
+    "job_title": "Senior Data Engineer",
+    "company_name": "Trustify Technology",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "Spark",
+      "SQL",
+      "Python",
+      "Snowflake",
+      "English"
+    ],
+    "posted_text": "Posted\n16 minutes ago",
+    "collected_at": "2026-06-25T01:16:46.657Z"
+  },
+  {
+    "job_id": "itviec_chuyen-vien-data-engineer-python-sql-global-glory-5405",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/chuyen-vien-data-engineer-python-sql-global-glory-5405?lab_feature=preview_jd_page",
+    "job_title": "Chuyên viên Data Engineer (Python, SQL)",
+    "company_name": "Global Glory",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "Cloud",
+      "SQL",
+      "Python"
+    ],
+    "posted_text": "Posted\n4 days ago",
+    "collected_at": "2026-06-25T01:16:46.657Z"
+  },
+  {
+    "job_id": "itviec_senior-officer-data-engineer-techcomlife-techcombank-3456",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-officer-data-engineer-techcomlife-techcombank-3456?lab_feature=preview_jd_page",
+    "job_title": "Senior Officer, Data Engineer- TechcomLife",
+    "company_name": "Techcombank",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "Agile",
+      "SQL",
+      "Microservices",
+      "Scala",
+      "Big Data"
+    ],
+    "posted_text": "Posted\n5 days ago",
+    "collected_at": "2026-06-25T01:16:46.658Z"
+  },
+  {
+    "job_id": "itviec_senior-data-engineer-co-signing-bonus-amigo-5620",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-data-engineer-co-signing-bonus-amigo-5620?lab_feature=preview_jd_page",
+    "job_title": "Senior Data Engineer (Có signing bonus)",
+    "company_name": "Amigo",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "Git",
+      "Big Data",
+      "Business Intelligence",
+      "Data Warehousing",
+      "Data Analysis"
+    ],
+    "posted_text": "Posted\n12 days ago",
+    "collected_at": "2026-06-25T01:16:46.658Z"
+  },
+  {
+    "job_id": "itviec_chuyen-vien-quan-tri-co-so-du-lieu-dba-vrb-4906",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/chuyen-vien-quan-tri-co-so-du-lieu-dba-vrb-4906?lab_feature=preview_jd_page",
+    "job_title": "Chuyên viên Quản trị cơ sở dữ liệu (Data Engineer)",
+    "company_name": "VRB",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "Database",
+      "SQL",
+      "Unix",
+      "Linux",
+      "Business Analysis"
+    ],
+    "posted_text": "Posted\n14 days ago",
+    "collected_at": "2026-06-25T01:16:46.659Z"
+  },
+  {
+    "job_id": "itviec_senior-data-engineer-python-sql-cong-ty-tnhh-stravo-vietnam-4421",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-data-engineer-python-sql-cong-ty-tnhh-stravo-vietnam-4421?lab_feature=preview_jd_page",
+    "job_title": "Senior Data Engineer (Python, SQL)",
+    "company_name": "Công ty TNHH Stravo Vietnam",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "ELT",
+      "Apache Airflow",
+      "Python",
+      "SQL"
+    ],
+    "posted_text": "Posted\n18 days ago",
+    "collected_at": "2026-06-25T01:16:46.659Z"
+  },
+  {
+    "job_id": "itviec_data-engineer-data-warehouse-python-java-sql-shs-chung-khoan-sai-gon-ha-noi-1034",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/data-engineer-data-warehouse-python-java-sql-shs-chung-khoan-sai-gon-ha-noi-1034?lab_feature=preview_jd_page",
+    "job_title": "Data Engineer (Data Warehouse, Python/Java, SQL)",
+    "company_name": "SHS | Chứng khoán Sài Gòn - Hà Nội",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "ELT",
+      "Java",
+      "Python",
+      "SQL",
+      "Data Warehousing"
+    ],
+    "posted_text": "Posted\n19 days ago",
+    "collected_at": "2026-06-25T01:16:46.660Z"
+  },
+  {
+    "job_id": "itviec_data-engineer-data-division-mb-bank-2310",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/data-engineer-data-division-mb-bank-2310?lab_feature=preview_jd_page",
+    "job_title": "Data Engineer - Data Division",
+    "company_name": "MB Bank",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "Power BI",
+      "Tableau",
+      "Business Intelligence",
+      "Cloud",
+      "Oracle"
+    ],
+    "posted_text": "Posted\n20 days ago",
+    "collected_at": "2026-06-25T01:16:46.661Z"
+  },
+  {
+    "job_id": "itviec_senior-lead-data-engineer-aws-databricks-itviec-recruitment-consulting-2146",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-lead-data-engineer-aws-databricks-itviec-recruitment-consulting-2146?lab_feature=preview_jd_page",
+    "job_title": "Senior/Lead Data Engineer (AWS/Databricks)",
+    "company_name": "ITviec Recruitment Consulting",
+    "location": "Ho Chi Minh - Ha Noi",
+    "work_model": "Hybrid",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "Terraform",
+      "Cloud",
+      "AWS",
+      "Databricks",
+      "English"
+    ],
+    "posted_text": "Posted\n22 days ago",
+    "collected_at": "2026-06-25T01:16:46.661Z"
+  },
+  {
+    "job_id": "itviec_data-engineer-de-heus-asia-5236",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/data-engineer-de-heus-asia-5236?lab_feature=preview_jd_page",
+    "job_title": "Data Engineer",
+    "company_name": "De Heus Asia",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Python",
+      "AI",
+      "Data Engineer",
+      "Databricks",
+      "Microsoft Azure SQL Database",
+      "SQL"
+    ],
+    "posted_text": "Posted\n26 days ago",
+    "collected_at": "2026-06-25T01:16:46.662Z"
+  },
+  {
+    "job_id": "itviec_software-engineer-data-focused-python-sql-airr-labs-4959",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/software-engineer-data-focused-python-sql-airr-labs-4959?lab_feature=preview_jd_page",
+    "job_title": "Software Engineer (Data Focused, Python, SQL)",
+    "company_name": "AIRR Labs",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "AWS",
+      "Cloud",
+      "JavaScript",
+      "SQL",
+      "Python"
+    ],
+    "posted_text": "Posted\n27 days ago",
+    "collected_at": "2026-06-25T01:16:46.663Z"
+  },
+  {
+    "job_id": "itviec_senior-data-engineer-data-platform-engineer-airr-labs-4300",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-data-engineer-data-platform-engineer-airr-labs-4300?lab_feature=preview_jd_page",
+    "job_title": "Senior Data Engineer/Data Platform Engineer",
+    "company_name": "AIRR Labs",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "AWS Lambda",
+      "Python",
+      "SQL",
+      "AWS",
+      "Database"
+    ],
+    "posted_text": "Posted\n27 days ago",
+    "collected_at": "2026-06-25T01:16:46.663Z"
+  },
+  {
+    "job_id": "itviec_data-engineer-sap-bw-sql-c-java-etl-thuan-thanh-tech-4755",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/data-engineer-sap-bw-sql-c-java-etl-thuan-thanh-tech-4755?lab_feature=preview_jd_page",
+    "job_title": "Data Engineer (SAP BW, SQL, C#, Java, ETL)",
+    "company_name": "Thuan Thanh Tech",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "SAP",
+      "ETL",
+      "C#",
+      "Java",
+      "SQL"
+    ],
+    "posted_text": "Posted\n32 days ago",
+    "collected_at": "2026-06-25T01:16:46.664Z"
+  },
+  {
+    "job_id": "itviec_senior-data-engineer-financial-crime-gotymex-4606",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-data-engineer-financial-crime-gotymex-4606?lab_feature=preview_jd_page",
+    "job_title": "Senior Data Engineer - Financial Crime",
+    "company_name": "GoTymeX",
+    "location": "Ho Chi Minh",
+    "work_model": "Hybrid",
+    "salary_hidden": true,
+    "skills": [
+      "Databricks",
+      "Spark",
+      "Snowflake",
+      "SQL",
+      "Python",
+      "AWS"
+    ],
+    "posted_text": "Posted\n3 days ago",
+    "collected_at": "2026-06-25T01:16:46.664Z"
+  },
+  {
+    "job_id": "itviec_data-engineer-ai-python-sql-etl-english-up-to-3000-sun-group-3823",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/data-engineer-ai-python-sql-etl-english-up-to-3000-sun-group-3823?lab_feature=preview_jd_page",
+    "job_title": "Data Engineer (AI/Python/SQL/ETL/English) up to $3000",
+    "company_name": "Sun Group",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "AI",
+      "SQL",
+      "ETL",
+      "English",
+      "Python"
+    ],
+    "posted_text": "Posted\n6 days ago",
+    "collected_at": "2026-06-25T01:16:49.862Z"
+  },
+  {
+    "job_id": "itviec_industrial-data-systems-engineer-cong-ty-tnhh-peregrine-management-viet-nam-3610",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/industrial-data-systems-engineer-cong-ty-tnhh-peregrine-management-viet-nam-3610?lab_feature=preview_jd_page",
+    "job_title": "Industrial Data Systems Engineer",
+    "company_name": "Công ty TNHH Peregrine Management Việt Nam",
+    "location": "Ha Noi - Ho Chi Minh - Da Nang",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Python",
+      "Docker",
+      "Linux",
+      "Database"
+    ],
+    "posted_text": "Posted\n9 days ago",
+    "collected_at": "2026-06-25T01:16:49.862Z"
+  },
+  {
+    "job_id": "itviec_senior-data-engineer-databricks-mlops-aws-gotymex-2332",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-data-engineer-databricks-mlops-aws-gotymex-2332?lab_feature=preview_jd_page",
+    "job_title": "Senior Data Engineer (Databricks, MLops, AWS)",
+    "company_name": "GoTymeX",
+    "location": "Ho Chi Minh",
+    "work_model": "Hybrid",
+    "salary_hidden": true,
+    "skills": [
+      "Python",
+      "MLOps",
+      "Apache Spark",
+      "AWS",
+      "Databricks",
+      "SQL"
+    ],
+    "posted_text": "Posted\n13 days ago",
+    "collected_at": "2026-06-25T01:16:49.862Z"
+  },
+  {
+    "job_id": "itviec_sr-software-engineer-data-systems-python-golang-ai-coderpush-3802",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/sr-software-engineer-data-systems-python-golang-ai-coderpush-3802?lab_feature=preview_jd_page",
+    "job_title": "Sr Software Engineer-Data Systems (Python/Golang/AI )",
+    "company_name": "CoderPush",
+    "location": "Ho Chi Minh",
+    "work_model": "Hybrid",
+    "salary_hidden": true,
+    "skills": [
+      "Python",
+      "AI",
+      "System Architecture",
+      "Data Engineer",
+      "PostgreSql",
+      "Golang"
+    ],
+    "posted_text": "Posted\n14 days ago",
+    "collected_at": "2026-06-25T01:16:49.863Z"
+  },
+  {
+    "job_id": "itviec_data-engineer-banking-dbt-aws-pratek-4100",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/data-engineer-banking-dbt-aws-pratek-4100?lab_feature=preview_jd_page",
+    "job_title": "Data Engineer (Banking, dbt, AWS)",
+    "company_name": "PRATEK",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "DBT",
+      "Power BI",
+      "AWS",
+      "SQL",
+      "Python",
+      "Databricks"
+    ],
+    "posted_text": "Posted\n22 days ago",
+    "collected_at": "2026-06-25T01:16:49.863Z"
+  },
+  {
+    "job_id": "itviec_senior-data-engineer-urbox-3622",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-data-engineer-urbox-3622?lab_feature=preview_jd_page",
+    "job_title": "Senior Data Engineer",
+    "company_name": "URBOX",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Database",
+      "Apache Spark",
+      "ETL",
+      "AWS",
+      "SQL",
+      "Python"
+    ],
+    "posted_text": "Posted\n34 days ago",
+    "collected_at": "2026-06-25T01:16:49.864Z"
+  },
+  {
+    "job_id": "itviec_ai-powered-automation-engineer-itviec-recruitment-consulting-4219",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/ai-powered-automation-engineer-itviec-recruitment-consulting-4219?lab_feature=preview_jd_page",
+    "job_title": "AI-Powered Automation Engineer",
+    "company_name": "ITviec Recruitment Consulting",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Python",
+      "Power Automate",
+      "English"
+    ],
+    "posted_text": "Posted\n1 day ago",
+    "collected_at": "2026-06-25T01:16:49.864Z"
+  },
+  {
+    "job_id": "itviec_senior-lead-platform-engineer-databricks-mlops-aws-gotymex-1647",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-lead-platform-engineer-databricks-mlops-aws-gotymex-1647?lab_feature=preview_jd_page",
+    "job_title": "Senior/Lead Platform Engineer (Databricks, MLops, AWS)",
+    "company_name": "GoTymeX",
+    "location": "Ho Chi Minh",
+    "work_model": "Hybrid",
+    "salary_hidden": true,
+    "skills": [
+      "AWS",
+      "CI/CD",
+      "SQL",
+      "Python",
+      "MLOps",
+      "Databricks"
+    ],
+    "posted_text": "Posted\n3 days ago",
+    "collected_at": "2026-06-25T01:16:49.864Z"
+  },
+  {
+    "job_id": "itviec_data-tech-lead-sql-python-data-modeling-aws-cong-ty-tnhh-stravo-vietnam-4341",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/data-tech-lead-sql-python-data-modeling-aws-cong-ty-tnhh-stravo-vietnam-4341?lab_feature=preview_jd_page",
+    "job_title": "Data Tech Lead (SQL, Python, Data Modeling, AWS)",
+    "company_name": "Công ty TNHH Stravo Vietnam",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "Leadership",
+      "AWS",
+      "Data modeling",
+      "Python",
+      "SQL"
+    ],
+    "posted_text": "Posted\n18 days ago",
+    "collected_at": "2026-06-25T01:16:49.865Z"
+  },
+  {
+    "job_id": "itviec_software-engineer-for-cad-3d-data-itviec-recruitment-consulting-5034",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/software-engineer-for-cad-3d-data-itviec-recruitment-consulting-5034?lab_feature=preview_jd_page",
+    "job_title": "Software Engineer for CAD/3D Data",
+    "company_name": "ITviec Recruitment Consulting",
+    "location": "Ho Chi Minh - Ha Noi",
+    "work_model": "Hybrid",
+    "salary_hidden": true,
+    "skills": [
+      "Data Analysis",
+      "Docker",
+      "AI",
+      "AutoCAD",
+      "DevOps",
+      "Data Science"
+    ],
+    "posted_text": "Posted\n4 days ago",
+    "collected_at": "2026-06-25T01:16:49.865Z"
+  },
+  {
+    "job_id": "itviec_data-architect-data-warehousing-etl-elt-sql-oracle-vietinbank-1424",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/data-architect-data-warehousing-etl-elt-sql-oracle-vietinbank-1424?lab_feature=preview_jd_page",
+    "job_title": "Data Architect (Data Warehousing, ETL/ELT, SQL, Oracle)",
+    "company_name": "VietinBank",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "ETL",
+      "ELT",
+      "Data Warehousing",
+      "Oracle",
+      "SQL"
+    ],
+    "posted_text": "Posted\n1 day ago",
+    "collected_at": "2026-06-25T01:16:49.865Z"
+  },
+  {
+    "job_id": "itviec_data-architect-tong-cong-ty-tan-cang-sai-gon-saigon-newport-corporation-2906",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/data-architect-tong-cong-ty-tan-cang-sai-gon-saigon-newport-corporation-2906?lab_feature=preview_jd_page",
+    "job_title": "Data Architect",
+    "company_name": "Tổng công ty Tân Cảng Sài Gòn (Saigon NewPort Corporation)",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Engineer",
+      "System Architecture",
+      "Data modeling",
+      "Data Warehousing",
+      "Big Data",
+      "Data Analysis"
+    ],
+    "posted_text": "Posted\n5 days ago",
+    "collected_at": "2026-06-25T01:16:49.866Z"
+  },
+  {
+    "job_id": "itviec_chief-ai-transformation-officer-caito-cmc-technology-solution-4210",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/chief-ai-transformation-officer-caito-cmc-technology-solution-4210?lab_feature=preview_jd_page",
+    "job_title": "Chief AI Transformation Officer-CAITO, Data Warehousing",
+    "company_name": "CMC Technology & Solution",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "AI",
+      "Data Engineer",
+      "Stakeholder management",
+      "Data Warehousing",
+      "Solution Architecture",
+      "Leadership"
+    ],
+    "posted_text": "Posted\n6 days ago",
+    "collected_at": "2026-06-25T01:16:49.866Z"
+  },
+  {
+    "job_id": "itviec_enterprise-database-architect-fintech-vietpay-corporation-0215",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/enterprise-database-architect-fintech-vietpay-corporation-0215?lab_feature=preview_jd_page",
+    "job_title": "Enterprise Database Architect (Fintech)",
+    "company_name": "Vietpay Corporation",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Database",
+      "Data Engineer",
+      "MongoDB",
+      "SQL"
+    ],
+    "posted_text": "Posted\n8 days ago",
+    "collected_at": "2026-06-25T01:16:49.866Z"
+  },
+  {
+    "job_id": "itviec_software-engineer-web-scraping-automation-ngs-4703",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/software-engineer-web-scraping-automation-ngs-4703?lab_feature=preview_jd_page",
+    "job_title": "Software Engineer (Web Scraping & Automation)",
+    "company_name": "NGS",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Python",
+      "Kafka",
+      "Twisted",
+      "HTML"
+    ],
+    "posted_text": "Posted\n8 days ago",
+    "collected_at": "2026-06-25T01:16:49.866Z"
+  },
+  {
+    "job_id": "itviec_presales-intern-cong-ty-nang-luong-moi-truong-bien-dong-esec-5423",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/presales-intern-cong-ty-nang-luong-moi-truong-bien-dong-esec-5423?lab_feature=preview_jd_page",
+    "job_title": "Presales Intern",
+    "company_name": "Công Ty Năng Lượng Môi Trường Biển Đông (ESEC)",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Internship Accepted",
+      "English",
+      "Presale",
+      "Design",
+      "Python"
+    ],
+    "posted_text": "Posted\n22 days ago",
+    "collected_at": "2026-06-25T01:16:49.867Z"
+  },
+  {
+    "job_id": "itviec_hcm-senior-platform-engineer-infra-devops-sre-one-mount-group-2453",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/hcm-senior-platform-engineer-infra-devops-sre-one-mount-group-2453?lab_feature=preview_jd_page",
+    "job_title": "[HCM] (Senior) Platform Engineer (Infra/DevOps/SRE)",
+    "company_name": "One Mount Group",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Database",
+      "Linux",
+      "AI",
+      "DevOps"
+    ],
+    "posted_text": "Posted\n24 days ago",
+    "collected_at": "2026-06-25T01:16:49.867Z"
+  },
+  {
+    "job_id": "itviec_engineering-manager-digital-banking-fintech-product-itviec-recruitment-consulting-2046",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/engineering-manager-digital-banking-fintech-product-itviec-recruitment-consulting-2046?lab_feature=preview_jd_page",
+    "job_title": "Engineering Manager (Digital Banking / Fintech Product)",
+    "company_name": "ITviec Recruitment Consulting",
+    "location": "Ho Chi Minh",
+    "work_model": "Hybrid",
+    "salary_hidden": true,
+    "skills": [
+      "Database",
+      "DevOps",
+      "API",
+      "Team Management",
+      "Microservices",
+      "AWS"
+    ],
+    "posted_text": "Posted\n25 days ago",
+    "collected_at": "2026-06-25T01:16:49.868Z"
+  },
+  {
+    "job_id": "itviec_web-scraping-developer-officience-2433",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/web-scraping-developer-officience-2433?lab_feature=preview_jd_page",
+    "job_title": "Web Scraping Developer",
+    "company_name": "Officience",
+    "location": "Ho Chi Minh",
+    "work_model": "Hybrid",
+    "salary_hidden": true,
+    "skills": [
+      "Fresher Accepted",
+      "Linux",
+      "Playwright",
+      "SQL",
+      "NodeJS",
+      "Python",
+      "API"
+    ],
+    "posted_text": "Posted\n33 days ago",
+    "collected_at": "2026-06-25T01:16:49.868Z"
+  },
+  {
+    "job_id": "itviec_ai-engineer-dinh-huong-data-scientist-kalapa-1759",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/ai-engineer-dinh-huong-data-scientist-kalapa-1759?lab_feature=preview_jd_page",
+    "job_title": "AI Engineer (Định hướng Data Scientist)",
+    "company_name": "KALAPA",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Science",
+      "AI",
+      "Python",
+      "Machine Learning"
+    ],
+    "posted_text": "Posted\n14 hours ago",
+    "collected_at": "2026-06-25T01:16:49.868Z"
+  },
+  {
+    "job_id": "itviec_it-backup-system-operator-windows-vmware-ctcp-san-giao-dich-tai-san-ma-hoa-viet-nam-thinh-vuong-caex-0020",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/it-backup-system-operator-windows-vmware-ctcp-san-giao-dich-tai-san-ma-hoa-viet-nam-thinh-vuong-caex-0020?lab_feature=preview_jd_page",
+    "job_title": "Data Backup & Recovery Engineer (VMware & Windows)",
+    "company_name": "CTCP SÀN GIAO DỊCH TÀI SẢN MÃ HÓA VIỆT NAM THỊNH VƯỢNG (CAEX)",
+    "location": "Ha Noi",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "VMware",
+      "Information Security",
+      "Windows Server",
+      "System Admin",
+      "Networking"
+    ],
+    "posted_text": "Posted\n6 days ago",
+    "collected_at": "2026-06-25T01:16:59.803Z"
+  },
+  {
+    "job_id": "itviec_hn-principal-senior-qaqc-engineer-ai-data-project-money-forward-vietnam-co-ltd-2820",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/hn-principal-senior-qaqc-engineer-ai-data-project-money-forward-vietnam-co-ltd-2820?lab_feature=preview_jd_page",
+    "job_title": "[HN] Principal/Senior QAQC Engineer (AI & Data Project)",
+    "company_name": "MONEY FORWARD VIETNAM CO.,LTD",
+    "location": "Ha Noi",
+    "work_model": "Hybrid",
+    "salary_hidden": true,
+    "skills": [
+      "Automation Test",
+      "AI",
+      "Playwright",
+      "Database",
+      "QA QC",
+      "English"
+    ],
+    "posted_text": "Posted\n9 days ago",
+    "collected_at": "2026-06-25T01:16:59.804Z"
+  },
+  {
+    "job_id": "itviec_senior-data-engineer-itviec-recruitment-consulting-5928",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-data-engineer-itviec-recruitment-consulting-5928?lab_feature=preview_jd_page",
+    "job_title": "Senior Data Engineer",
+    "company_name": "ITviec Recruitment Consulting",
+    "location": "Ho Chi Minh",
+    "work_model": "Hybrid",
+    "salary_hidden": true,
+    "skills": [
+      "Python",
+      "Pandas",
+      "OOP",
+      "C++",
+      "NumPy"
+    ],
+    "posted_text": "Posted\n13 days ago",
+    "collected_at": "2026-06-25T01:16:59.804Z"
+  },
+  {
+    "job_id": "itviec_data-engineer-vnggames-3046",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/data-engineer-vnggames-3046?lab_feature=preview_jd_page",
+    "job_title": "Data Engineer",
+    "company_name": "VNGGames",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Apache Spark",
+      "Apache Airflow"
+    ],
+    "posted_text": "Posted\n15 days ago",
+    "collected_at": "2026-06-25T01:16:59.805Z"
+  },
+  {
+    "job_id": "itviec_remote-technical-leader-database-azure-upto-3300-catalytics-data-international-5749",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/remote-technical-leader-database-azure-upto-3300-catalytics-data-international-5749?lab_feature=preview_jd_page",
+    "job_title": "[Remote] Technical Leader (Database, Azure)- Upto 3300$",
+    "company_name": "Catalytics Data International",
+    "location": "Ho Chi Minh",
+    "work_model": "Remote",
+    "salary_hidden": true,
+    "skills": [
+      "Database",
+      "CI/CD",
+      "C#",
+      "DevOps",
+      "Data Engineer",
+      "Azure"
+    ],
+    "posted_text": "Posted\n15 days ago",
+    "collected_at": "2026-06-25T01:16:59.805Z"
+  },
+  {
+    "job_id": "itviec_senior-data-scientist-spiraledge-0613",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/senior-data-scientist-spiraledge-0613?lab_feature=preview_jd_page",
+    "job_title": "Senior Data Scientist",
+    "company_name": "Spiraledge",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Science",
+      "Database",
+      "Data Engineer"
+    ],
+    "posted_text": "Posted\n16 days ago",
+    "collected_at": "2026-06-25T01:16:59.806Z"
+  },
+  {
+    "job_id": "itviec_data-analyst-and-process-improvement-power-bi-sql-dsv-x-schenker-3059",
+    "source": "ITviec",
+    "job_url": "https://itviec.com/it-jobs/data-analyst-and-process-improvement-power-bi-sql-dsv-x-schenker-3059?lab_feature=preview_jd_page",
+    "job_title": "Data Analyst and Process Improvement (Power BI, SQL)",
+    "company_name": "DSV X Schenker",
+    "location": "Ho Chi Minh",
+    "work_model": "At office",
+    "salary_hidden": true,
+    "skills": [
+      "Data Analysis",
+      "Data Engineer",
+      "English",
+      "Crystal",
+      "SQL",
+      "Power BI"
+    ],
+    "posted_text": "Posted\n25 days ago",
+    "collected_at": "2026-06-25T01:16:59.806Z"
+  }
+]
