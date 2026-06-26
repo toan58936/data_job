@@ -1,16 +1,27 @@
 """
 salary.py - Chuẩn hóa lương
+Hỗ trợ cả lương thô (parse từ text) và lương đã được pre-parsed (từ ITviec)
 """
+
 import re
 from typing import Optional, Dict, Any
 
 
-def parse_salary(raw_salary: Optional[str]) -> Dict[str, Any]:
+def parse_salary(
+    raw_salary: Optional[str],
+    pre_parsed: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
     """
-    Parse chuỗi lương thành các trường chuẩn hóa.
+    Parse hoặc trả về lương đã được xử lý sẵn.
 
     Args:
-        raw_salary: Chuỗi lương thô
+        raw_salary: Chuỗi lương thô (dùng cho TopCV hoặc fallback)
+        pre_parsed: Dict chứa lương đã parse sẵn (từ ITviec), có các key:
+            - min: float
+            - max: float
+            - currency: str (VND/USD)
+            - unit: str (MONTH/YEAR/HOUR)
+            - is_negotiable: bool
 
     Returns:
         Dict: {
@@ -20,6 +31,16 @@ def parse_salary(raw_salary: Optional[str]) -> Dict[str, Any]:
             'is_negotiable': bool
         }
     """
+    # Ưu tiên pre-parsed nếu có
+    if pre_parsed and pre_parsed.get('min') is not None:
+        return {
+            'salary_min': pre_parsed['min'],
+            'salary_max': pre_parsed['max'],
+            'currency': pre_parsed.get('currency') or 'VND',
+            'is_negotiable': pre_parsed.get('is_negotiable', False)
+        }
+
+    # Fallback: parse từ raw text
     if not raw_salary:
         return {
             'salary_min': None,

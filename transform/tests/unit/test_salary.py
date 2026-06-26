@@ -24,6 +24,56 @@ def test_parse_salary_parametrize(input_val, expected):
     assert parse_salary(input_val) == expected
 
 
+# ==================== TEST PRE-PARSED SALARY (ITviec) ====================
+@pytest.mark.parametrize("pre_parsed, raw_salary, expected", [
+    # Case 1: Có pre_parsed đầy đủ → override raw
+    (
+        {'min': 1500, 'max': 3000, 'currency': 'USD', 'unit': 'MONTH', 'is_negotiable': False},
+        "some raw text",
+        {'salary_min': 1500.0, 'salary_max': 3000.0, 'currency': 'USD', 'is_negotiable': False}
+    ),
+    # Case 2: pre_parsed có is_negotiable=True
+    (
+        {'min': 10.0, 'max': 20.0, 'currency': 'VND', 'unit': 'MONTH', 'is_negotiable': True},
+        "some raw text",
+        {'salary_min': 10.0, 'salary_max': 20.0, 'currency': 'VND', 'is_negotiable': True}
+    ),
+    # Case 3: pre_parsed chỉ có min
+    (
+        {'min': 1000, 'max': None, 'currency': 'USD', 'unit': 'MONTH', 'is_negotiable': False},
+        "some raw text",
+        {'salary_min': 1000.0, 'salary_max': None, 'currency': 'USD', 'is_negotiable': False}
+    ),
+    # Case 4: Không có pre_parsed, raw_salary rỗng → fallback parse thất bại
+    (
+        None,
+        None,
+        {'salary_min': None, 'salary_max': None, 'currency': None, 'is_negotiable': False}
+    ),
+])
+def test_parse_salary_pre_parsed(pre_parsed, raw_salary, expected):
+    """
+    Kiểm tra pre_parsed salary từ ITviec.
+    - Nếu có pre_parsed, parse_salary bỏ qua raw_salary.
+    - Nếu không có pre_parsed, parse_salary parse raw_salary.
+    """
+    result = parse_salary(raw_salary=raw_salary, pre_parsed=pre_parsed)
+    assert result == expected
+
+
+# ==================== TEST ƯU TIÊN PRE-PARSED ====================
+def test_parse_salary_pre_parsed_priority():
+    """
+    Kiểm tra pre_parsed được ưu tiên hơn raw_salary ngay cả khi raw có dữ liệu.
+    """
+    raw_salary = "100 - 200 triệu"
+    pre_parsed = {'min': 30.0, 'max': 50.0, 'currency': 'USD', 'unit': 'MONTH', 'is_negotiable': False}
+    result = parse_salary(raw_salary=raw_salary, pre_parsed=pre_parsed)
+    assert result['salary_min'] == 30.0
+    assert result['salary_max'] == 50.0
+    assert result['currency'] == 'USD'
+
+
 # ==================== TEST VỚI DỮ LIỆU MẪU ====================
 def test_parse_salary_with_sample(sample_jobs_all, sample_jobs_detail):
     """

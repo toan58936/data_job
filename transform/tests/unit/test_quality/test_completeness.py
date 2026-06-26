@@ -27,17 +27,24 @@ def test_completeness_missing_data():
         'location_clean': ['Hà Nội', None],
         'normalized_role': ['Data Engineer', 'Data Analyst'],
         'salary_min': [10.0, None],
-        'salary_max': [15.0, None],  # <-- SỬA: thêm None để tỷ lệ 50%
+        'salary_max': [15.0, None],
         'skills': [[], None],
         'deadline': ['2026-12-31', None]
     })
-    result = check_completeness(df)
+    
+    # CẬP NHẬT: Truyền field_error_thresholds để override threshold cho salary_min và salary_max
+    # Giúp test kiểm tra được tính năng override của config
+    field_overrides = {
+        'salary_min': 0.5,
+        'salary_max': 0.5,
+    }
+    result = check_completeness(df, field_error_thresholds=field_overrides)
 
-    # title: 1/2 = 50% -> ERROR (dùng ngưỡng chung 80%)
+    # title: 1/2 = 50% -> ERROR (ngưỡng chung 80%)
     assert result['title']['percentage'] == 50.0
     assert result['title']['status'] == 'ERROR'
 
-    # salary_min: 1/2 = 50% -> WARNING (vì override ngưỡng 50%)
+    # salary_min: 1/2 = 50% -> WARNING (override 50%)
     assert result['salary_min']['percentage'] == 50.0
     assert result['salary_min']['status'] == 'WARNING'
 
@@ -45,7 +52,7 @@ def test_completeness_missing_data():
     assert result['salary_max']['percentage'] == 50.0
     assert result['salary_max']['status'] == 'WARNING'
 
-    # deadline: 1/2 = 50% -> ERROR (dùng ngưỡng chung)
+    # deadline: 1/2 = 50% -> ERROR (ngưỡng chung)
     assert result['deadline']['percentage'] == 50.0
     assert result['deadline']['status'] == 'ERROR'
 
@@ -81,7 +88,6 @@ def test_completeness_missing_column():
     assert result['location_clean']['percentage'] == 0.0
     assert result['location_clean']['status'] == 'ERROR'
     assert result['salary_min']['percentage'] == 0.0
-    # 0% < 50% nên vẫn là ERROR (không phải WARNING)
     assert result['salary_min']['status'] == 'ERROR'
 
 
