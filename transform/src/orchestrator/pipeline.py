@@ -50,7 +50,8 @@ def process_record(record: Dict[str, Any]) -> SilverJob:
         title=record.get('title'),
         description=record.get('description'),
         requirements=record.get('requirements'),
-        skill_keywords=SKILL_KEYWORDS
+        skill_keywords=SKILL_KEYWORDS,
+        pre_extracted=record.get('skills_pre_extracted')
     )
 
     # 5. Domain keywords (làm giàu)
