@@ -1,20 +1,22 @@
-// crawlers/version_demo/list_crawler_itviet2_fixed.js
+// crawlers/src/itviec/list_crawler.js
 const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const path = require('path');
 
 // ==================== XÁC ĐỊNH ROOT DỰ ÁN ====================
-const PROJECT_ROOT = path.resolve(__dirname, '../../');
+const ROOT = path.resolve(__dirname, '../../../');
+const BRONZE_ITVIEC_DIR = path.resolve(ROOT, 'data/bronze/itviec');
+const LOG_DIR = path.resolve(ROOT, 'logs/crawler/itviec');
 
 // ==================== CẤU HÌNH ====================
 const CONFIG = {
     baseUrl: 'https://itviec.com',
     roles: ['data-engineer', 'data-analyst', 'data-scientist', 'business-intelligence'],
-    outputDir: path.resolve(PROJECT_ROOT, 'logs/crawler'),
-    rawDir: path.resolve(PROJECT_ROOT, 'data/bronze/itviec'),
-    checkpointDir: path.resolve(PROJECT_ROOT, 'data/bronze/itviec'),
-    finalOutput: path.resolve(PROJECT_ROOT, 'data/bronze/itviec/itviec_jobs_all.json'),
+    outputDir: LOG_DIR,
+    checkpointDir: BRONZE_ITVIEC_DIR,
+    // Output chính — đã đổi tên từ itviec_jobs_all.json → jobs_all.json
+    finalOutput: path.resolve(BRONZE_ITVIEC_DIR, 'jobs_all.json'),
     maxPages: 10,
     maxRetries: 3,
     retryDelay: 5000,
@@ -35,10 +37,11 @@ function ensureDir(dir) {
 
 function log(role, message, level = 'INFO') {
     const timestamp = new Date().toISOString();
-    const logMsg = `[${timestamp}] [${level}] [${role}] ${message}`;
+    const tag = role ? `[${role}]` : '';
+    const logMsg = `[${timestamp}] [${level}]${tag} ${message}`;
     console.log(logMsg);
     ensureDir(CONFIG.outputDir);
-    fs.appendFileSync(path.join(CONFIG.outputDir, `itviec_${role}.log`), logMsg + '\n');
+    fs.appendFileSync(path.join(CONFIG.outputDir, 'itviec_list.log'), logMsg + '\n');
 }
 
 function randomUserAgent() {
@@ -131,39 +134,7 @@ function parseListingPage(html) {
     return { jobs, hasNextPage, notFound: false };
 }
 
-// ==================== LƯU DỮ LIỆU ====================
-function saveRawHtml(html, role, page) {
-    const today = new Date().toISOString().slice(0, 10);
-    const dir = path.join(CONFIG.rawDir, today, role);
-    ensureDir(dir);
-    fs.writeFileSync(path.join(dir, `listing_page${page}.html`), html, 'utf-8');
-}
-
-/**
- * Ghi danh sách job vào file JSON (mảng) cho từng role.
- * Nếu file tồn tại, đọc mảng cũ, concat với mảng mới và ghi lại.
- */
-function appendJobsJson(jobs, role) {
-    if (jobs.length === 0) return;
-    const today = new Date().toISOString().slice(0, 10);
-    const dir = path.join(CONFIG.rawDir, today);
-    ensureDir(dir);
-    const filepath = path.join(dir, `${role}.json`);
-
-    let existing = [];
-    if (fs.existsSync(filepath)) {
-        try {
-            existing = JSON.parse(fs.readFileSync(filepath, 'utf8'));
-            if (!Array.isArray(existing)) existing = [];
-        } catch (e) {
-            existing = [];
-        }
-    }
-    const merged = existing.concat(jobs);
-    fs.writeFileSync(filepath, JSON.stringify(merged, null, 2), 'utf-8');
-    log(role, `Đã lưu ${jobs.length} jobs → ${filepath} (tổng ${merged.length})`);
-}
-
+// ==================== UPSERT ====================
 function upsertJobs(newJobs, filePath) {
     ensureDir(path.dirname(filePath));
     let existingJobs = [];
@@ -248,7 +219,8 @@ async function crawlRole(role) {
             break;
         }
 
-        saveRawHtml(html, role, pageNum);
+        // KHÔNG còn lưu raw HTML vào data/bronze — đã bỏ để giữ sạch bronze
+        // Nếu cần debug, có thể bật lại bằng cách thêm option --save-raw
 
         const { jobs: pageJobs, hasNextPage, notFound } = parseListingPage(html);
 
@@ -263,8 +235,6 @@ async function crawlRole(role) {
         log(role, `Trang ${pageNum}: ${pageJobs.length} jobs (${newJobs.length} mới)`);
         allJobsThisRun.push(...newJobs);
 
-        if (newJobs.length > 0) appendJobsJson(newJobs, role);
-
         saveCheckpoint(role, pageNum, allJobsThisRun);
 
         if (!hasNextPage) {
@@ -275,6 +245,7 @@ async function crawlRole(role) {
         await randomDelay();
     }
 
+    // Upsert trực tiếp vào finalOutput (jobs_all.json)
     const { total, added } = upsertJobs(allJobsThisRun, CONFIG.finalOutput);
     log(role, `Upsert: +${added} job mới, tổng ${total} job trong ${CONFIG.finalOutput}`);
 
@@ -293,9 +264,8 @@ async function crawlRole(role) {
 
     console.log(`=== ITVIEC LISTING CRAWLER — roles: ${roles.join(', ')} ===`);
     ensureDir(CONFIG.outputDir);
-    ensureDir(CONFIG.rawDir);
     ensureDir(CONFIG.checkpointDir);
-    ensureDir(path.dirname(CONFIG.finalOutput));
+    ensureDir(BRONZE_ITVIEC_DIR);
 
     const results = [];
     for (let i = 0; i < roles.length; i++) {
