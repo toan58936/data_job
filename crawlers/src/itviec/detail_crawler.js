@@ -367,16 +367,16 @@ async function crawlDetail(page, jobUrl, retryCount = 0) {
             salaryData = extractSalaryFromHtml($);
         }
         if (!salaryData) {
-            const bodyText = $('body').text();
-            const isNegotiable = /cạnh tranh|competitive|thoả thuận|negotiable/i.test(bodyText);
+            // Khi không tìm thấy salary, coi như lương thỏa thuận (ẩn)
+            // Đây là hành vi đúng với ITviec vì phần lớn job không công bố lương
             salaryData = {
-                salary_text:   isNegotiable ? 'Competitive' : '',
+                salary_text:   'Thoả thuận',
                 salary_min:    null,
                 salary_max:    null,
                 currency:      null,
                 unit:          null,
-                salary_source: isNegotiable ? 'text-competitive' : 'none',
-                isNegotiable,
+                salary_source: 'hidden',
+                isNegotiable:  true,   // Luôn true vì lương bị ẩn → thỏa thuận
             };
         }
 

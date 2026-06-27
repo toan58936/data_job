@@ -34,32 +34,49 @@ def process_record(record: Dict[str, Any]) -> SilverJob:
     """
     Áp dụng tất cả các processor lên một bản ghi thô, trả về đối tượng SilverJob.
     """
-    # 1. Location
-    location_clean = clean_location(record.get('location'))
+    # ── Field names sau source_normalizer ──────────────────────────────
+    # source_normalizer.py đổi tên các field thô về contract chuẩn:
+    #   location   → location_raw      (tránh xung đột với location_clean)
+    #   salary     → salary_raw        (TopCV: text thô; ITviec: None nếu có pre-parsed)
+    #   experience → experience_raw
+    # pipeline.py phải đọc đúng tên đã chuẩn hóa này.
+    # ───────────────────────────────────────────────────────────────────
 
-    # 2. Experience
-    exp_raw = record.get('experience')
+    # 1. Location — đọc location_raw (đã chuẩn hóa bởi normalizer)
+    location_clean = clean_location(record.get('location_raw'))
+
+    # 2. Experience — đọc experience_raw
+    exp_raw = record.get('experience_raw')
     exp_min, exp_max = parse_experience(exp_raw)
 
-    # 3. Salary
-    salary_raw = record.get('salary')
-    salary_info = parse_salary(salary_raw)
+    # 3. Salary — ưu tiên pre-parsed (ITviec detail đã có salary_min/max)
+    #    nếu không có thì parse từ salary_raw text (TopCV)
+    salary_pre = record.get('salary_pre_parsed')
+    if salary_pre and (salary_pre.get('min') is not None or salary_pre.get('max') is not None):
+        salary_info = {
+            'salary_min':    salary_pre.get('min'),
+            'salary_max':    salary_pre.get('max'),
+            'currency':      salary_pre.get('currency'),
+            'is_negotiable': salary_pre.get('is_negotiable', False),
+        }
+    else:
+        salary_info = parse_salary(record.get('salary_raw'))
 
-    # 4. Skills
+    # 4. Skills — ưu tiên skills_pre_extracted (ITviec listing đã extract)
     skills = extract_skills(
         title=record.get('title'),
         description=record.get('description'),
         requirements=record.get('requirements'),
         skill_keywords=SKILL_KEYWORDS,
-        pre_extracted=record.get('skills_pre_extracted')
+        pre_extracted=record.get('skills_pre_extracted'),
     )
 
-    # 5. Domain keywords (làm giàu)
+    # 5. Domain keywords
     domain_keywords = extract_domain_keywords(
         title=record.get('title'),
         description=record.get('description'),
         requirements=record.get('requirements'),
-        domain_keywords=DOMAIN_KEYWORDS
+        domain_keywords=DOMAIN_KEYWORDS,
     )
 
     # 6. Role
@@ -68,11 +85,11 @@ def process_record(record: Dict[str, Any]) -> SilverJob:
     # 7. Seniority
     seniority_level = derive_seniority(record.get('title'), exp_min)
 
-    # 8. Work mode
+    # 8. Work mode — ITviec dùng 'work_model', TopCV dùng 'working_time'
     work_mode, job_work_from_home = derive_work_mode(
-        working_time=record.get('working_time'),
+        working_time=record.get('working_time') or record.get('work_model'),
         description=record.get('description'),
-        requirements=record.get('requirements')
+        requirements=record.get('requirements'),
     )
 
     # 9. Job schedule type
@@ -81,12 +98,12 @@ def process_record(record: Dict[str, Any]) -> SilverJob:
 
     # 10. Tạo đối tượng SilverJob
     silver_job = SilverJob(
-        job_id=record.get('id'),
-        source=record.get('source', 'TopCV'),
-        job_url=record.get('url') or record.get('normalized_url'),
+        job_id=record.get('job_id'),
+        source=record.get('source', 'Unknown'),
+        job_url=record.get('job_url'),
         title=record.get('title'),
         company=record.get('company'),
-        location_raw=record.get('location'),
+        location_raw=record.get('location_raw'),
         location_clean=location_clean,
         salary_min=salary_info['salary_min'],
         salary_max=salary_info['salary_max'],
@@ -98,7 +115,7 @@ def process_record(record: Dict[str, Any]) -> SilverJob:
         level=record.get('level'),
         number_of_hires=record.get('number_of_hires'),
         job_schedule_type=job_schedule_type,
-        working_time=record.get('working_time'),
+        working_time=record.get('working_time') or record.get('work_model'),
         job_country="Vietnam",
         work_mode=work_mode,
         job_work_from_home=job_work_from_home,
