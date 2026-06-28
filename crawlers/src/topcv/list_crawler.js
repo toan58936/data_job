@@ -7,20 +7,19 @@ const cheerio = require('cheerio');
 chromium.use(StealthPlugin());
 
 // ==================== ĐỌC THAM SỐ CLI ====================
-// Nhận --roles với danh sách role phân cách bằng dấu phẩy
-// Ví dụ: --roles data-engineer,data-analyst,data-scientist
-// Không có kiểm tra VALID_ROLES ở đây — CLI đã đảm nhận.
 const args = process.argv.slice(2);
 const rolesIndex = args.indexOf('--roles');
 const ROLES_ARG = rolesIndex !== -1 ? args[rolesIndex + 1] : 'data-engineer';
-
-// Nếu không có --roles, mặc định chỉ crawl data-engineer (standalone)
 const ROLES = ROLES_ARG ? ROLES_ARG.split(',').map(r => r.trim()) : ['data-engineer'];
 
 // ==================== CẤU HÌNH ====================
+// Đường dẫn đầu ra cho TopCV
+const ROOT = path.resolve(__dirname, '../../../');
+const BRONZE_TOPCV_DIR = path.resolve(ROOT, 'data/bronze/topcv');
+
 const BASE_CONFIG = {
-    outputDir: path.resolve(__dirname, '../../logs/crawler'),
-    finalOutput: path.resolve(__dirname, '../../data/bronze/jobs_all.json'),
+    outputDir: path.resolve(ROOT, 'logs/crawler'),
+    finalOutput: path.resolve(BRONZE_TOPCV_DIR, 'jobs_all.json'),  // ← ĐÃ SỬA
     maxRetries: 3,
     retryDelay: 5000,
     waitBetweenPages: 2000,
@@ -37,11 +36,11 @@ function buildRoleConfig(role) {
         ...BASE_CONFIG,
         role,
         baseUrl: `https://www.topcv.vn/tim-viec-lam-${role}?type_keyword=1&sba=1`,
-        checkpointFile: path.resolve(__dirname, `../../data/bronze/checkpoint_${role}.json`),
+        checkpointFile: path.resolve(ROOT, `data/bronze/checkpoint_${role}.json`), // vẫn để tạm
     };
 }
 
-// ==================== TIỆN ÍCH ====================
+// ==================== TIỆN ÍCH (giữ nguyên nhưng có thể thay bằng base/utils sau) ====================
 function ensureDir(dir) {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
@@ -61,6 +60,7 @@ function normalizeUrl(url) {
 }
 
 function upsertJobs(newJobs, filePath, role) {
+    ensureDir(path.dirname(filePath));
     let existingJobs = [];
     if (fs.existsSync(filePath)) {
         try { existingJobs = JSON.parse(fs.readFileSync(filePath, 'utf8')); }
@@ -196,6 +196,7 @@ async function crawlPage(cfg, page, pageNum, retryCount = 0) {
 async function crawlRole(context, role) {
     const cfg = buildRoleConfig(role);
     ensureDir(BASE_CONFIG.outputDir);
+    ensureDir(BRONZE_TOPCV_DIR);
     log(role, `=== START CRAWL JOB LIST FOR ROLE: ${role} ===`);
     const page = await context.newPage();
     let allJobsThisRun = [];
@@ -226,7 +227,7 @@ async function crawlRole(context, role) {
             }
         }
         log(role, `Raw: ${allJobsThisRun.length}, Unique: ${uniqueThisRun.length}`);
-        const result = upsertJobs(uniqueThisRun, BASE_CONFIG.finalOutput, role);
+        const result = upsertJobs(uniqueThisRun, cfg.finalOutput, role);
         if (result.error) {
             log(role, `Upsert failed: ${result.error}`, 'ERROR');
             return { role, status: 'failed', error: result.error };

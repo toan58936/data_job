@@ -7,13 +7,16 @@ const cheerio = require('cheerio');
 chromium.use(StealthPlugin());
 
 // ==================== CẤU HÌNH ====================
+// Đường dẫn mới cho TopCV
+const ROOT = path.resolve(__dirname, '../../../');
+const BRONZE_TOPCV_DIR = path.resolve(ROOT, 'data/bronze/topcv');
+const LOG_DIR = path.resolve(ROOT, 'logs/crawler/topcv');
 
 const CONFIG = {
-    inputFile: path.resolve(__dirname, '../../data/bronze/jobs_all.json'),
-    outputDir: path.resolve(__dirname, '../../logs/crawler'),
-    outputFile: path.resolve(__dirname, '../../data/bronze/jobs_detail.json'),
-    checkpointFile: path.resolve(__dirname, '../../data/bronze/checkpoint_detail.json'),
-    // ... giữ nguyên
+    inputFile: path.resolve(BRONZE_TOPCV_DIR, 'jobs_all.json'),      // ← ĐÃ SỬA
+    outputDir: LOG_DIR,                                               // ← ĐÃ SỬA
+    outputFile: path.resolve(BRONZE_TOPCV_DIR, 'jobs_detail.json'),  // ← ĐÃ SỬA
+    checkpointFile: path.resolve(BRONZE_TOPCV_DIR, 'checkpoint_detail.json'), // ← ĐÃ SỬA (tách riêng)
     maxRetries: 2,
     retryDelay: 5000,
     delayBetweenJobs: 7000,
@@ -31,7 +34,7 @@ const CONFIG = {
     selectorTimeout: 20000,
 };
 
-// ==================== TIỆN ÍCH ====================
+// ==================== TIỆN ÍCH (giữ nguyên) ====================
 function ensureDir(dir) {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
@@ -51,43 +54,23 @@ function normalizeUrl(url) {
     return idx === -1 ? url : url.substring(0, idx);
 }
 
-// ==================== HÀM KIỂM TRA TRANG HỢP LỆ ====================
+// ==================== HÀM KIỂM TRA TRANG HỢP LỆ (giữ nguyên) ====================
 function isPageValid(response, finalUrl, originalUrl, html) {
-    // Kiểm tra HTTP status
+    // ... (giữ nguyên toàn bộ logic)
     if (response && response.status() !== 200) {
         log(`HTTP status ${response.status()} for ${originalUrl}`, 'WARN');
         return false;
     }
-    // Kiểm tra redirect (so sánh URL chuẩn hóa)
     if (normalizeUrl(finalUrl) !== normalizeUrl(originalUrl)) {
         log(`Redirect detected: ${originalUrl} -> ${finalUrl}`, 'WARN');
         return false;
     }
 
-    // ── FIX: Chỉ kiểm tra <head> thay vì scan toàn bộ HTML ────────────────
-    // Vấn đề cũ: scan lowerHtml.includes('captcha') trên toàn bộ HTML
-    // → False positive vì TopCV có thể chứa từ "captcha" trong nội dung job,
-    //   script analytics, hoặc footer — không liên quan đến Cloudflare challenge.
-    //
-    // Cloudflare challenge thật sự luôn nằm trong <title> và <meta> của <head>,
-    // KHÔNG bao giờ lẫn vào content thông thường.
-    // Các dấu hiệu Cloudflare challenge thực tế:
-    //   <title>Just a moment...</title>
-    //   <meta name="cf-challenge" ...>
-    //   <div id="cf-wrapper"> hoặc id="challenge-form"
-    //
-    // Cách fix: chỉ extract phần <head> (ngắn, ~2KB) và kiểm tra trong đó,
-    // kết hợp với selector CF-specific thay vì text tự do.
     const headMatch = html.match(/<head[\s\S]*?<\/head>/i);
     const headHtml = headMatch ? headMatch[0].toLowerCase() : '';
-
-    // Chỉ check các pattern CỐ ĐỊNH của Cloudflare/bot-wall trong <head>
     const headPatterns = [
-        'just a moment',       // Cloudflare: <title>Just a moment...</title>
-        'cf-challenge',        // Cloudflare: <meta name="cf-challenge">
-        'challenge-platform',  // Cloudflare Turnstile
-        'id="challenge-form"', // Cloudflare challenge form
-        'id="cf-wrapper"',     // Cloudflare wrapper
+        'just a moment', 'cf-challenge', 'challenge-platform',
+        'id="challenge-form"', 'id="cf-wrapper"'
     ];
     for (const pattern of headPatterns) {
         if (headHtml.includes(pattern)) {
@@ -96,7 +79,6 @@ function isPageValid(response, finalUrl, originalUrl, html) {
         }
     }
 
-    // Kiểm tra HTTP error page (404/403) qua title — không scan body
     const titleMatch = headHtml.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
     const pageTitle = titleMatch ? titleMatch[1].toLowerCase() : '';
     const errorTitles = ['403', '404', 'not found', 'forbidden', 'access denied'];
@@ -106,12 +88,12 @@ function isPageValid(response, finalUrl, originalUrl, html) {
             return false;
         }
     }
-
     return true;
 }
 
-// ==================== HÀM LẤY GIÁ TRỊ THEO LABEL ====================
+// ==================== HÀM LẤY GIÁ TRỊ THEO LABEL (giữ nguyên) ====================
 function getValueByLabel($, labelText) {
+    // ... (giữ nguyên code cũ)
     let $label = $(`strong:contains("${labelText}"), b:contains("${labelText}"), .label:contains("${labelText}"), [class*="label"]:contains("${labelText}"), .basic-information-item__data--label:contains("${labelText}")`).first();
     if ($label.length === 0) {
         $label = $(`*:contains("${labelText}")`).filter(function() {
@@ -139,8 +121,9 @@ function getValueByLabel($, labelText) {
     return '';
 }
 
-// ==================== HÀM CRAWL CHI TIẾT JOB (cải tiến) ====================
+// ==================== HÀM CRAWL CHI TIẾT JOB (giữ nguyên) ====================
 async function crawlJobDetail(page, jobUrl, retryCount = 0) {
+    // ... (giữ nguyên toàn bộ logic)
     log(`Crawling detail: ${jobUrl}`);
     let response = null;
     try {
@@ -151,7 +134,6 @@ async function crawlJobDetail(page, jobUrl, retryCount = 0) {
         const html = await page.content();
         const finalUrl = page.url();
 
-        // Kiểm tra tính hợp lệ của trang
         if (!isPageValid(response, finalUrl, jobUrl, html)) {
             log(`Page invalid for ${jobUrl}, skipping`, 'WARN');
             return null;
@@ -167,11 +149,7 @@ async function crawlJobDetail(page, jobUrl, retryCount = 0) {
         let title = $('h1, .job-title, .title-detail').first().text().trim();
         const company = $('.company-name, .company, .org').first().text().trim();
 
-        // Xử lý title bị lỗi (sẽ được fix sau, nhưng vẫn lấy)
-        // Lưu ý: không gán luôn original_title ở đây vì chưa có map
-
         let salary = getValueByLabel($, 'Mức lương');
-        // Loại bỏ giá trị sai "thị trường cho vị trí này"
         if (salary && salary.includes('thị trường cho vị trí này')) salary = '';
 
         const experience = getValueByLabel($, 'Kinh nghiệm');
@@ -179,7 +157,6 @@ async function crawlJobDetail(page, jobUrl, retryCount = 0) {
         if (!deadlineRaw) deadlineRaw = getValueByLabel($, 'Hạn nộp hồ sơ');
 
         let location = getValueByLabel($, 'Địa điểm');
-        // Nếu location bị "Địa điểm" hoặc rỗng, thử fallback nhẹ
         if (!location || location === 'Địa điểm' || location === 'Tìm kiếm' || /\{\{.*\}\}/.test(location)) {
             const $locationDiv = $('.job-detail_info-section-content-location, .job-detail-info-location, [class*="location"]').first();
             if ($locationDiv.length) location = $locationDiv.text().trim();
@@ -188,7 +165,6 @@ async function crawlJobDetail(page, jobUrl, retryCount = 0) {
             const $locationLink = $('a[title*="Hà Nội"]').first();
             if ($locationLink.length) location = $locationLink.text().trim();
         }
-        // Không dùng regex bắt thành phố từ fullText (dễ sai) – để transform layer xử lý sau
 
         const level = getValueByLabel($, 'Cấp bậc');
         let numberOfHiresRaw = getValueByLabel($, 'Số lượng tuyển');
@@ -242,9 +218,7 @@ async function crawlJobDetail(page, jobUrl, retryCount = 0) {
             }).first().text().trim();
         }
 
-        // Fallback location nếu vẫn rỗng và có location_detail (ưu tiên lấy từ chi tiết)
         if ((!location || location === 'Địa điểm') && location_detail) {
-            // Thử lấy tên thành phố từ location_detail (có thể tách sau)
             const cityMatch = location_detail.match(/(Hà Nội|Hồ Chí Minh|Đà Nẵng|Hải Phòng|Cần Thơ)/);
             if (cityMatch) location = cityMatch[1];
         }
@@ -278,13 +252,14 @@ async function crawlJobDetail(page, jobUrl, retryCount = 0) {
     }
 }
 
-// ==================== CHECKPOINT DỰA TRÊN URL (cải tiến) ====================
+// ==================== CHECKPOINT THEO URL (giữ nguyên) ====================
 function saveCheckpointByUrl(lastUrl, pendingUrls) {
     const checkpoint = {
         lastUrl: lastUrl,
         pendingUrls: pendingUrls,
         timestamp: Date.now()
     };
+    ensureDir(path.dirname(CONFIG.checkpointFile));
     fs.writeFileSync(CONFIG.checkpointFile, JSON.stringify(checkpoint, null, 2));
     log(`Checkpoint saved: lastUrl = ${lastUrl}, remaining ${pendingUrls.length} jobs`);
 }
@@ -302,6 +277,7 @@ function loadCheckpointByUrl() {
 }
 
 function upsertJob(newJob, filePath) {
+    ensureDir(path.dirname(filePath));
     let existingJobs = [];
     if (fs.existsSync(filePath)) {
         try {
@@ -323,9 +299,10 @@ function upsertJob(newJob, filePath) {
     return existingJobs.length;
 }
 
-// ==================== KHỞI CHẠY (cải tiến checkpoint theo URL) ====================
+// ==================== KHỞI CHẠY ====================
 (async () => {
     ensureDir(CONFIG.outputDir);
+    ensureDir(BRONZE_TOPCV_DIR);
     log('=== START CRAWL ALL JOB DETAILS (IMPROVED - VALIDATION + URL CHECKPOINT) ===');
     log(`Mode: ${CONFIG.headless ? 'Headless' : 'Headed'}`);
 
@@ -336,13 +313,11 @@ function upsertJob(newJob, filePath) {
     const allJobsFromList = JSON.parse(fs.readFileSync(CONFIG.inputFile, 'utf8'));
     log(`Total jobs in list: ${allJobsFromList.length}`);
 
-    // Map original_title theo normalized_url
     const originalTitleMap = new Map();
     for (const job of allJobsFromList) {
         originalTitleMap.set(normalizeUrl(job.url), job.title);
     }
 
-    // Đọc danh sách job đã crawl detail
     let existingDetailMap = new Map();
     if (fs.existsSync(CONFIG.outputFile)) {
         try {
@@ -357,7 +332,6 @@ function upsertJob(newJob, filePath) {
         }
     }
 
-    // Danh sách job cần crawl (chưa có detail) – lưu dưới dạng URL
     let pendingUrls = allJobsFromList
         .filter(job => !existingDetailMap.has(normalizeUrl(job.url)))
         .map(job => normalizeUrl(job.url));
@@ -369,7 +343,6 @@ function upsertJob(newJob, filePath) {
         process.exit(0);
     }
 
-    // Khôi phục checkpoint
     const checkpoint = loadCheckpointByUrl();
     let remainingUrls = pendingUrls;
     let startUrl = null;
@@ -384,14 +357,12 @@ function upsertJob(newJob, filePath) {
         if (fs.existsSync(CONFIG.checkpointFile)) fs.unlinkSync(CONFIG.checkpointFile);
     }
 
-    // Tìm index bắt đầu
     let startIndex = 0;
     if (startUrl) {
         const idx = remainingUrls.findIndex(url => url === normalizeUrl(startUrl));
         if (idx !== -1) startIndex = idx + 1;
     }
 
-    // Khởi tạo browser
     const browser = await chromium.launch({
         headless: CONFIG.headless,
         args: CONFIG.launchArgs,
@@ -420,7 +391,6 @@ function upsertJob(newJob, filePath) {
 
             const detail = await crawlJobDetail(page, originalJob.url);
             if (detail) {
-                // Fix title nếu bị lỗi (Tin tuyển dụng, rỗng, trùng company, domain)
                 const fixedTitle = detail.title;
                 if (fixedTitle === 'Tin tuyển dụng' || fixedTitle === '' || fixedTitle === detail.company ||
                     fixedTitle.includes('topcv.vn') || fixedTitle.includes('www.topcv.vn')) {
@@ -430,17 +400,12 @@ function upsertJob(newJob, filePath) {
                         detail.title = originalTitle;
                     }
                 }
-                // Nếu salary vẫn rỗng, giữ nguyên (transform sau)
                 detail.original_title = originalJob.title;
                 upsertJob(detail, CONFIG.outputFile);
             } else {
                 log(`Failed to crawl detail for ${originalJob.url}`, 'WARN');
-                // Vẫn giữ URL trong danh sách pending? Không, vì nó đã được xử lý và fail.
-                // Tuy nhiên, nếu muốn retry ở lần sau, cần lưu lại URL fail. Ở đây ta sẽ bỏ qua, vì đã retry trong hàm.
-                // Nếu fail sau maxRetries, coi như bỏ qua.
             }
 
-            // Cập nhật checkpoint sau mỗi job (lưu danh sách còn lại)
             const remainingAfter = remainingUrls.slice(i + 1);
             saveCheckpointByUrl(originalJob.url, remainingAfter);
 

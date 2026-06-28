@@ -1,5 +1,6 @@
 """
 skills.py - Trích xuất kỹ năng từ văn bản (sử dụng Regex tổng hợp)
+Hỗ trợ cả pre-extracted skills (từ ITviec) và extract từ text (TopCV)
 """
 
 import re
@@ -34,7 +35,8 @@ def extract_skills(
     title: Optional[str],
     description: Optional[str],
     requirements: Optional[str],
-    skill_keywords: List[str]
+    skill_keywords: List[str],
+    pre_extracted: Optional[List[str]] = None
 ) -> List[str]:
     """
     Trích xuất danh sách kỹ năng từ title, description, requirements.
@@ -45,10 +47,24 @@ def extract_skills(
         description: Mô tả công việc
         requirements: Yêu cầu công việc
         skill_keywords: Danh sách các từ khóa kỹ năng cần tìm
+        pre_extracted: Danh sách kỹ năng đã được trích xuất sẵn (từ ITviec)
 
     Returns:
         List[str]: Danh sách kỹ năng đã tìm thấy (đã sắp xếp)
     """
+    # Ưu tiên pre_extracted nếu được truyền vào (kể cả empty list)
+    if isinstance(pre_extracted, list):
+        # Normalize và lọc
+        skill_set = set(skill_keywords)
+        domain_set = set(DOMAIN_KEYWORDS)
+        normalized = set()
+        for s in pre_extracted:
+            s_lower = s.lower().strip()
+            if s_lower in skill_set and s_lower not in domain_set:
+                normalized.add(s_lower)
+        return sorted(list(normalized))
+
+    # Fallback: extract từ text (TopCV)
     # 1. Gộp văn bản
     texts = []
     if title:
@@ -70,7 +86,7 @@ def extract_skills(
         if re.search(pattern, full_text):
             found_skills.add(keyword)
 
-    # 3. Loại bỏ các kỹ năng trùng với DOMAIN_KEYWORDS (để tránh nhiễu)
+    # 3. Loại bỏ các kỹ năng trùng với DOMAIN_KEYWORDS
     domain_set = set(DOMAIN_KEYWORDS)
     found_skills = found_skills - domain_set
 

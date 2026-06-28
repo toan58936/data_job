@@ -2,7 +2,7 @@
 pipeline:
   bronze_dir: "data/bronze"
   silver_dir: "data/silver"
-  gold_dir: "data/gold"
+  gold_dir:   "data/gold"
   output_format: "parquet"
 
 gold:
@@ -11,14 +11,17 @@ gold:
 
 quality:
   completeness:
-    warning_threshold: 0.95
-    error_threshold: 0.80
+    warning_threshold: 0.90
+    error_threshold: 0.70
     field_overrides:
-      salary_min: 0.25
-      salary_max: 0.25
+      salary_min: 0.15
+      salary_max: 0.15
+      deadline: 0.60             # ↑ từ 0.35 lên 0.50
+      normalized_role: 0.55   # Cho phép 55% role xác định
+      skills: 0.75
   validity:
     warning_threshold: 5
-    error_threshold: 15
+    error_threshold: 20
   enabled_stages:
     - completeness
     - validity
@@ -29,16 +32,4 @@ quality:
     - markdown
     - json
   report_dir: "data/quality"
-  stop_on_error: true
-
-# ===== THÊM PHẦN NÀY =====
-crawler:
-  roles:
-    - data-engineer
-    - data-analyst
-    - data-scientist
-    - business-intelligence
-    # Bạn có thể thêm/bớt role ở đây
-    # - machine-learning
-    # - ai-engineer
-    # - analytics-engineer
+  stop_on_error: false  

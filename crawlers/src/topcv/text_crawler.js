@@ -7,10 +7,15 @@ const cheerio = require('cheerio');
 chromium.use(StealthPlugin());
 
 // ==================== CẤU HÌNH ====================
+// Đường dẫn mới cho TopCV
+const ROOT = path.resolve(__dirname, '../../../');
+const BRONZE_TOPCV_DIR = path.resolve(ROOT, 'data/bronze/topcv');
+const LOG_DIR = path.resolve(ROOT, 'logs/crawler/topcv');
+
 const CONFIG = {
-    inputFile: path.resolve(__dirname, '../../data/bronze/jobs_all.json'),
-    outputFile: path.resolve(__dirname, '../../data/bronze/job_text_final.json'),
-    checkpointFile: path.resolve(__dirname, '../../data/bronze/checkpoint_text_final.json'),
+    inputFile: path.resolve(BRONZE_TOPCV_DIR, 'jobs_all.json'),           // ← ĐÃ SỬA
+    outputFile: path.resolve(BRONZE_TOPCV_DIR, 'job_text_final.json'),    // ← ĐÃ SỬA
+    checkpointFile: path.resolve(BRONZE_TOPCV_DIR, 'checkpoint_text.json'), // ← ĐÃ SỬA
     maxRetries: 2,
     retryDelay: 5000,
     delayBetweenJobs: 7000,
@@ -42,8 +47,8 @@ function log(message, level = 'INFO') {
     const timestamp = new Date().toISOString();
     const logMsg = `[${timestamp}] [${level}] ${message}`;
     console.log(logMsg);
-    ensureDir(path.resolve(__dirname, '../../logs/crawler'));
-    const logFile = path.resolve(__dirname, '../../logs/crawler/crawl_text_final.log');
+    ensureDir(LOG_DIR);
+    const logFile = path.join(LOG_DIR, 'crawl_text.log');
     fs.appendFileSync(logFile, logMsg + '\n');
 }
 
@@ -53,7 +58,7 @@ function normalizeUrl(url) {
     return idx === -1 ? url : url.substring(0, idx);
 }
 
-// ==================== KIỂM TRA TRANG HỢP LỆ ====================
+// ==================== KIỂM TRA TRANG HỢP LỆ (giữ nguyên) ====================
 function isPageValid(response, finalUrl, originalUrl, html) {
     if (response && response.status() !== 200) {
         log(`HTTP status ${response.status()} for ${originalUrl}`, 'WARN');
@@ -111,7 +116,6 @@ function extractByHeadings($, contentSelector, headingKeyword) {
 
 // ==================== FALLBACK ĐẶC BIỆT CHO BRAND BỊ THIẾU DESCRIPTION ====================
 function extractBrandDescription($, html) {
-    // Fallback 1: heading chứa "mô tả" (h1-h4)
     let found = '';
     $('h1, h2, h3, h4').each((_, el) => {
         const text = $(el).text().toLowerCase().trim();
@@ -128,7 +132,6 @@ function extractBrandDescription($, html) {
     });
     if (found) return found;
 
-    // Fallback 2: selector class/id đặc thù
     const brandSelectors = [
         '#box-job-information-detail',
         '.job-description-content',
@@ -152,7 +155,6 @@ function extractBrandDescription($, html) {
         }
     }
 
-    // Fallback 3: lấy text trước "Yêu cầu ứng viên" trong main container
     const mainContainer = $('main, .container, .job-detail, #content, .content-main').first();
     if (mainContainer.length) {
         const fullText = mainContainer.text();
@@ -164,7 +166,6 @@ function extractBrandDescription($, html) {
         }
     }
 
-    // Fallback 4: toàn bộ body trước "Yêu cầu ứng viên"
     $('nav, footer, header, script, style, [class*="menu"], [class*="sidebar"]').remove();
     const pageText = $('body').text().replace(/\s+/g, ' ').trim();
     const cutIdx = pageText.search(/yêu cầu ứng viên/i);
@@ -217,7 +218,6 @@ async function crawlJobText(page, jobUrl, retryCount = 0) {
         requirements = requirements.replace(/\s+/g, ' ').trim();
         benefits = benefits.replace(/\s+/g, ' ').trim();
 
-        // Nếu là brand đã biết và description rỗng, thử fallback đặc biệt
         if (id && BRAND_IDS_NEED_FIX.includes(id) && !description) {
             log(`Brand ${id} has empty description, trying advanced fallback...`, 'INFO');
             description = extractBrandDescription($, html);
@@ -243,7 +243,8 @@ async function crawlJobText(page, jobUrl, retryCount = 0) {
 
 // ==================== KHỞI CHẠY (VỚI CHECKPOINT) ====================
 (async () => {
-    ensureDir('./output');
+    ensureDir(LOG_DIR);
+    ensureDir(BRONZE_TOPCV_DIR);
     log('=== START CRAWL JOB TEXT (FINAL VERSION) ===');
     log(`Mode: ${CONFIG.headless ? 'Headless' : 'Headed'}`);
 
@@ -254,8 +255,7 @@ async function crawlJobText(page, jobUrl, retryCount = 0) {
     const allJobs = JSON.parse(fs.readFileSync(CONFIG.inputFile, 'utf8'));
     log(`Total jobs in list: ${allJobs.length}`);
 
-    // Đọc kết quả đã crawl (nếu có)
-    let existingMap = new Map(); // key = normalized_url
+    let existingMap = new Map();
     if (fs.existsSync(CONFIG.outputFile)) {
         try {
             const existing = JSON.parse(fs.readFileSync(CONFIG.outputFile, 'utf8'));
@@ -269,7 +269,6 @@ async function crawlJobText(page, jobUrl, retryCount = 0) {
         }
     }
 
-    // Lọc các job chưa crawl
     const jobsToCrawl = allJobs.filter(job => {
         const norm = normalizeUrl(job.url);
         return !existingMap.has(norm);
@@ -282,7 +281,6 @@ async function crawlJobText(page, jobUrl, retryCount = 0) {
         process.exit(0);
     }
 
-    // Checkpoint dựa trên pending URLs
     let pendingUrls = jobsToCrawl.map(job => normalizeUrl(job.url));
     let startIndex = 0;
     if (fs.existsSync(CONFIG.checkpointFile)) {
@@ -301,7 +299,6 @@ async function crawlJobText(page, jobUrl, retryCount = 0) {
         }
     }
 
-    // Khởi tạo browser
     const browser = await chromium.launch({ headless: CONFIG.headless, args: CONFIG.launchArgs });
     const context = await browser.newContext({
         userAgent: CONFIG.userAgent,
@@ -313,7 +310,6 @@ async function crawlJobText(page, jobUrl, retryCount = 0) {
         Object.defineProperty(navigator, 'webdriver', { get: () => false });
     });
 
-    // Kết quả cuối cùng (bao gồm cả các job đã có từ file cũ)
     let results = [];
     if (fs.existsSync(CONFIG.outputFile)) {
         try {
@@ -347,7 +343,6 @@ async function crawlJobText(page, jobUrl, retryCount = 0) {
             log(`Failed to get text for ${originalJob.url}`, 'WARN');
         }
 
-        // Lưu checkpoint và kết quả tạm thời
         const remaining = pendingUrls.slice(i + 1);
         fs.writeFileSync(CONFIG.checkpointFile, JSON.stringify({ lastUrl: originalJob.url, pendingUrls: remaining }, null, 2));
         fs.writeFileSync(CONFIG.outputFile, JSON.stringify(results, null, 2));

@@ -29,7 +29,8 @@ def check_completeness(
     df: pd.DataFrame,
     warning_threshold: float = 0.95,
     error_threshold: float = 0.80,
-    field_error_thresholds: Dict[str, float] = None
+    field_error_thresholds: Dict[str, float] = None,
+    source_expectations: Dict[str, Dict[str, list]] = None
 ) -> Dict[str, Dict[str, Any]]:
     """
     Kiểm tra tính đầy đủ của các trường quan trọng.
@@ -40,6 +41,11 @@ def check_completeness(
         error_threshold: Ngưỡng tỷ lệ để đạt ERROR (mặc định 80%).
         field_error_thresholds: Dict cho phép override error_threshold cho từng trường.
             Ví dụ: {'salary_min': 0.25, 'salary_max': 0.25}
+        source_expectations: Dict cấu hình expected fields theo source.
+            Ví dụ: {
+                'topcv': {'required': ['deadline'], 'optional': []},
+                'itviec': {'required': [], 'optional': ['deadline']}
+            }
     """
     # Khởi tạo field_error_thresholds nếu None
     if field_error_thresholds is None:
@@ -58,6 +64,10 @@ def check_completeness(
         return {}
 
     total_rows = len(df)
+
+    # Xác định source nếu có cột 'source'
+    has_source = 'source' in df.columns
+    source_col = df['source'] if has_source else None
 
     fields = {
         'title': {
@@ -82,6 +92,8 @@ def check_completeness(
             'condition': lambda s: s.notna() & s.apply(_has_value)
         },
         'deadline': {
+            # Deadline chỉ check cho TopCV (ITviec không có trường này)
+            'source_optional': 'itviec',
             'condition': lambda s: s.notna()
         }
     }
@@ -93,9 +105,24 @@ def check_completeness(
             count = 0
         else:
             condition = config['condition'](df[field])
-            count = condition.sum() if hasattr(condition, 'sum') else 0
+            
+            # Source-aware filtering: nếu field là source_optional cho một source,
+            # loại trừ records của source đó khỏi denominator
+            if 'source_optional' in config and has_source and source_col is not None:
+                optional_source = config['source_optional']
+                relevant_mask = source_col != optional_source
+                total_relevant = relevant_mask.sum()
+                if total_relevant > 0:
+                    count = (condition & relevant_mask).sum()
+                    total_rows_for_field = total_relevant
+                else:
+                    count = 0
+                    total_rows_for_field = 0
+            else:
+                count = condition.sum() if hasattr(condition, 'sum') else 0
+                total_rows_for_field = total_rows
 
-        percentage = (count / total_rows) * 100 if total_rows > 0 else 0.0
+        percentage = (count / total_rows_for_field) * 100 if total_rows_for_field > 0 else 0.0
 
         # Sử dụng resolved_overrides thay vì field_error_thresholds gốc
         current_error = resolved_overrides.get(field, error_threshold)
@@ -109,9 +136,17 @@ def check_completeness(
 
         results[field] = {
             'count': int(count),
-            'total': total_rows,
+            'total': total_rows_for_field,
             'percentage': round(percentage, 2),
             'status': status
+        }
+
+    # Thêm thông tin breakdown theo source nếu có cột source
+    if has_source and source_col is not None:
+        source_counts = source_col.value_counts().to_dict()
+        results['_source_breakdown'] = {
+            'total_sources': source_counts,
+            'note': 'Completeness calculated excluding source-optional fields where applicable'
         }
 
     return results

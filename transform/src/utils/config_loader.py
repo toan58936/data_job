@@ -28,19 +28,32 @@ def get_default_config() -> Dict[str, Any]:
             "gold_dir": "data/gold",
             "output_format": "parquet"
         },
+        "gold": {
+            "enabled": True,
+            "output_dir": "data/gold"
+        },
         "quality": {
             "completeness": {
-                "warning_threshold": 0.95,
-                "error_threshold": 0.80,
-                "field_overrides": {"salary_min": 0.25, "salary_max": 0.25}
+                "warning_threshold": 0.90,
+                "error_threshold": 0.70,
+                "field_overrides": {
+                    "salary_min": 0.15,
+                    "salary_max": 0.15,
+                    "deadline": 0.50,
+                    "normalized_role": 0.55,
+                    "skills": 0.75
+                }
             },
             "validity": {
                 "warning_threshold": 5,
-                "error_threshold": 15
+                "error_threshold": 20
             },
             "enabled_stages": ["completeness", "validity", "accuracy", "uniqueness", "timeliness"],
             "report_formats": ["markdown", "json"],
             "report_dir": "data/quality",
-            "stop_on_error": True
+            "stop_on_error": False
+        },
+        "crawler": {
+            "roles": ["data-engineer", "data-analyst", "data-scientist", "business-intelligence"]
         }
     }

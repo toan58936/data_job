@@ -34,6 +34,8 @@ class SilverJob:
     normalized_role: Optional[str] = None       # Data Engineer, Data Analyst, ...
     skills: List[str] = field(default_factory=list)
     domain_keywords: List[str] = field(default_factory=list)   # <-- THÊM MỚI
+    salary_source_type: Optional[str] = None    # explicit / negotiable / hidden / not_found
+    salary_hidden: bool = False                 # ITviec: lương bị ẩn bởi platform
     description: Optional[str] = None
     requirements: Optional[str] = None
     benefits: Optional[str] = None

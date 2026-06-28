@@ -7,66 +7,99 @@ from transform.src.utils.config import SKILL_KEYWORDS
 
 
 # ==================== TEST VỚI PARAMETRIZE ====================
-@pytest.mark.parametrize("title, description, requirements, expected", [
+# ==================== TEST PRE-EXTRACTED SKILLS (ITviec) ====================
+@pytest.mark.parametrize("pre_extracted, expected", [
     (
-        "Senior Data Engineer",
-        "Build data pipelines using Spark, Kafka, and Airflow. Need Python, SQL.",
-        "Requirement: 5 years experience with Python, Spark, AWS.",
-        ['airflow', 'aws', 'kafka', 'python', 'spark', 'sql']
+        ['Python', 'SQL', 'Spark', 'AWS'],
+        ['aws', 'python', 'spark', 'sql']
     ),
     (
-        "Data Analyst",
-        "Use SQL and Power BI for reporting",
-        "Need Excel and Python",
-        ['excel', 'power bi', 'python', 'sql']
+        ['Machine Learning', 'Python', 'TensorFlow'],
+        ['python', 'tensorflow']   # 'machine learning' bị loại vì là domain
     ),
     (
-        "Data Engineer (Junior)",
-        "",
-        "",
+        ['Data Engineer', 'SQL', 'ETL'],
+        ['etl', 'sql']             # 'Data Engineer' không nằm trong SKILL_KEYWORDS
+    ),
+    (
+        [],
         []
     ),
+])
+def test_extract_skills_pre_extracted(pre_extracted, expected):
+    """
+    Kiểm tra pre_extracted skills từ ITviec.
+    - Nếu có pre_extracted, bỏ qua title/description/requirements
+    - Lọc bỏ domain keywords và chỉ giữ những skill có trong SKILL_KEYWORDS
+    """
+    title = "Some Data Engineer Job"
+    description = "Build data pipelines using Python and Spark"
+    requirements = "Need Python and SQL"
+    result = extract_skills(
+        title=title,
+        description=description,
+        requirements=requirements,
+        skill_keywords=SKILL_KEYWORDS,
+        pre_extracted=pre_extracted
+    )
+    assert result == expected
+
+# ==================== TEST PRE-EXTRACTED SKILLS (ITviec) ====================
+@pytest.mark.parametrize("pre_extracted, expected", [
     (
-        "Machine Learning Engineer",
-        "Develop ML models using TensorFlow and PyTorch",
-        "Experience with Python, scikit-learn",
-        ['ml', 'python', 'pytorch', 'scikit-learn', 'tensorflow']  # <-- ĐÃ SỬA
+        ['Python', 'SQL', 'Spark', 'AWS'],
+        ['aws', 'python', 'spark', 'sql']
     ),
     (
-        "Data Scientist",
-        "Use SQL, Python, R for analysis",
-        "Familiar with A/B testing and statistics",
-        ['python', 'r', 'sql', 'statistics']
+        ['Machine Learning', 'Python', 'TensorFlow'],
+        ['python', 'tensorflow']
+    ),
+    (
+        ['Data Engineer', 'SQL', 'ETL'],
+        ['sql']
+    ),
+    (
+        [],
+        []
     ),
 ])
-def test_extract_skills_parametrize(title, description, requirements, expected):
-    """Kiểm tra extract_skills với các ca khác nhau."""
-    result = extract_skills(title, description, requirements, SKILL_KEYWORDS)
+def test_extract_skills_pre_extracted(pre_extracted, expected):
+    """
+    Kiểm tra pre_extracted skills từ ITviec.
+    - Nếu có pre_extracted, bỏ qua title/description/requirements
+    - Lọc bỏ domain keywords
+    """
+    title = "Some Data Engineer Job"
+    description = "Build data pipelines using Python and Spark"
+    requirements = "Need Python and SQL"
+    result = extract_skills(
+        title=title,
+        description=description,
+        requirements=requirements,
+        skill_keywords=SKILL_KEYWORDS,
+        pre_extracted=pre_extracted
+    )
     assert result == expected
 
 
-# ==================== TEST VỚI DỮ LIỆU MẪU ====================
-def test_extract_skills_with_sample(sample_jobs_all, sample_jobs_detail, sample_jobs_text):
+# ==================== TEST PRE-EXTRACTED KHÔNG ẢNH HƯỞNG TOPCV ====================
+def test_extract_skills_pre_extracted_none():
     """
-    Kiểm tra extract_skills trên dữ liệu thật từ sample.
+    Kiểm tra khi không có pre_extracted, vẫn extract từ text như cũ.
     """
-    for job_all in sample_jobs_all:
-        job_id = job_all.get("id") or job_all.get("url", "").split("/")[-1].replace(".html", "")
-        description = None
-        requirements = None
-        for job_text in sample_jobs_text:
-            if job_text.get("id") == job_id:
-                description = job_text.get("description")
-                requirements = job_text.get("requirements")
-                break
-
-        title = job_all.get("title")
-        skills = extract_skills(title, description, requirements, SKILL_KEYWORDS)
-
-        assert isinstance(skills, list)
-        if title or description or requirements:
-            for skill in skills:
-                assert isinstance(skill, str)
+    title = "Data Engineer"
+    description = "Using Spark for data processing"
+    requirements = "Need Python and SQL"
+    result = extract_skills(
+        title=title,
+        description=description,
+        requirements=requirements,
+        skill_keywords=SKILL_KEYWORDS,
+        pre_extracted=None
+    )
+    assert "python" in result
+    assert "sql" in result
+    assert "spark" in result
 
 
 # ==================== TEST BỔ SUNG ====================

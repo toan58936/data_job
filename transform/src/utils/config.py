@@ -61,42 +61,112 @@ SKILL_KEYWORDS: List[str] = [
 # Danh sách các role chuẩn theo thứ tự ưu tiên (khớp đầu tiên)
 # Sử dụng \b để khớp chính xác từ (không bị match sub-word)
 ROLE_MAPPING: List[Tuple[str, str]] = [
-    # ===== CÁC ROLE CHUẨN NGÀNH DATA =====
+    # ============================================================
+    # 1. PATTERN TIẾNG VIỆT (ưu tiên cao nhất)
+    # ============================================================
+    # Kỹ sư dữ liệu
+    (r"(?i)kỹ\s*sư\s*dữ\s*liệu", "Data Engineer"),
+    (r"(?i)kỹ\s*sư\s*data", "Data Engineer"),
+    
+    # Chuyên viên phân tích dữ liệu
+    (r"(?i)chuyên\s*viên\s*phân\s*tích\s*dữ\s*liệu", "Data Analyst"),
+    (r"(?i)nhân\s*viên\s*phân\s*tích\s*dữ\s*liệu", "Data Analyst"),
+    (r"(?i)chuyên\s*viên\s*data\s*analyst", "Data Analyst"),
+    (r"(?i)chuyên\s*viên\s*phân\s*tích\s*data", "Data Analyst"),
+    
+    # Khoa học dữ liệu
+    (r"(?i)chuyên\s*viên\s*khoa\s*học\s*dữ\s*liệu", "Data Scientist"),
+    (r"(?i)kỹ\s*sư\s*khoa\s*học\s*dữ\s*liệu", "Data Scientist"),
+    
+    # Kỹ sư AI
+    (r"(?i)kỹ\s*sư\s*ai", "AI Engineer"),
+    (r"(?i)kỹ\s*sư\s*trí\s*tuệ\s*nhân\s*tạo", "AI Engineer"),
+    (r"(?i)chuyên\s*viên\s*ai", "AI Engineer"),
+    
+    # Kỹ sư machine learning
+    (r"(?i)kỹ\s*sư\s*machine\s*learning", "ML Engineer"),
+    (r"(?i)chuyên\s*viên\s*machine\s*learning", "ML Engineer"),
+    
+    # ============================================================
+    # 2. COMPOUND TITLES & ROLE MỞ RỘNG
+    # ============================================================
+    # Data Engineer với các biến thể
+    (r"(?i)data\s*(?:engineer|analyst|scientist)\s*/\s*(?:bi|analytics|platform)", "Data Engineer"),
+    (r"(?i)senior\s*backends?\s*[-–]\s*data\s*platform", "Data Engineer"),
+    (r"(?i)fullstack\s*\(?\s*data\s*team\s*\)?", "Data Engineer"),
+    (r"(?i)data\s*platform\s*(?:engineer|developer)", "Data Platform Engineer"),
+    
+    # Data Architect & Solution
+    (r"(?i)data\s*(?:architect|solution\s*architect)", "Data Architect"),
+    (r"(?i)solution\s*architect\s*data", "Data Architect"),
+    
+    # ETL / Data Integration
+    (r"(?i)etl\s*(?:developer|engineer|architect)", "ETL Developer"),
+    (r"(?i)data\s*integration\s*(?:engineer|developer)", "ETL Developer"),
+    
+    # Analytics Engineer
+    (r"(?i)analytics\s*engineer", "Analytics Engineer"),
+    (r"(?i)data\s*analytics\s*engineer", "Analytics Engineer"),
+    
+    # BI / Business Intelligence
+    (r"(?i)bi\s*(?:engineer|developer|analyst)", "BI Analyst"),
+    (r"(?i)business\s*intelligence\s*(?:engineer|developer)", "BI Analyst"),
+    
+    # Data Quality / Data Governance
+    (r"(?i)data\s*quality\s*(?:engineer|analyst|specialist)", "Data Quality Engineer"),
+    (r"(?i)data\s*governance\s*(?:engineer|analyst)", "Data Governance Engineer"),
+    
+    # Database
+    (r"(?i)database\s*(?:engineer|administrator|developer|dba)", "Database Engineer"),
+    (r"(?i)db\s*(?:engineer|administrator)", "Database Engineer"),
+    
+    # Data Consultant
+    (r"(?i)data\s*(?:solution\s*)?consultant", "Data Consultant"),
+    (r"(?i)data\s*advisory", "Data Consultant"),
+    
+    # Data Manager
+    (r"(?i)data\s*manager", "Data Manager"),
+    (r"(?i)data\s*&\s*reporting\s*manager", "Data Manager"),
+    
+    # DataOps
+    (r"(?i)data\s*ops", "DataOps Engineer"),
+    (r"(?i)dataops\s*(?:engineer|developer)", "DataOps Engineer"),
+    
+    # ============================================================
+    # 3. ROLE CHUẨN (pattern gốc)
+    # ============================================================
+    # Data Engineer
     (r"\bdata engineer\b", "Data Engineer"),
+    # Data Analyst
     (r"\bdata analyst\b", "Data Analyst"),
+    # Data Scientist
     (r"\bdata scientist\b", "Data Scientist"),
+    # BI Analyst
     (r"\bbusiness intelligence\b|\bbi\b", "BI Analyst"),
+    # ML Engineer
     (r"\bmachine learning\b|\bml\b", "ML Engineer"),
+    # AI Engineer
     (r"\bai engineer\b|\bartificial intelligence\b", "AI Engineer"),
-    
-    # ===== CÁC ROLE MỞ RỘNG (PHƯƠNG ÁN B) =====
-    # Các role quản lý dữ liệu
-    (r"\bdata\s*&\s*reporting\b", "Data Manager"),
-    (r"\bdata\s*manager\b", "Data Manager"),
-    (r"\breporting\s*manager\b", "Reporting Manager"),
-    
-    # Các role chuyên môn dữ liệu
-    (r"\bdata quality\b", "Data Quality Engineer"),
-    (r"\bdata\s*quality\s*engineer\b", "Data Quality Engineer"),
-    
-    # Các role tư vấn/giải pháp
-    (r"\bdata\s*solution\s*consultant\b", "Data Consultant"),
-    (r"\bdata\s*consultant\b", "Data Consultant"),
-    (r"\bdata\s*solution\s*architect\b", "Data Architect"),
-    
-    # Các role database
-    (r"\bdatabase\s*engineering\b", "Database Engineer"),
-    (r"\bdatabase\s*administrator\b|\bdba\b", "Database Engineer"),
-    
-    # Các role platform/kiến trúc
+    # Database Engineer
+    (r"\bdatabase engineer\b|\bdatabase administrator\b|\bdba\b", "Database Engineer"),
+    # Data Architect
+    (r"\bdata architect\b", "Data Architect"),
+    # Data Platform Engineer
     (r"\bdata platform\b", "Data Platform Engineer"),
-    (r"\bdata\s*platform\s*engineer\b", "Data Platform Engineer"),
+    # ETL Developer
     (r"\betl developer\b", "ETL Developer"),
+    # DataOps
     (r"\bdata\s*ops\b", "DataOps Engineer"),
-    
-    # Các role phân tích nâng cao
+    # Analytics Engineer
     (r"\banalytics engineer\b", "Analytics Engineer"),
-    (r"\bdata\s*analytics\s*engineer\b", "Analytics Engineer"),
+    
+    # ============================================================
+    # 4. FALLBACK (nếu có "data" trong title nhưng chưa match)
+    # ============================================================
+    # Khi có từ "data" hoặc "analytics" nhưng chưa match pattern nào,
+    # đánh dấu là "Data Professional" (thay vì None)
+    (r"\bdata\b", "Data Professional"),
+    (r"\banalytics\b", "Data Professional"),
 ]
 
 # ==================== 3. MAPPING ĐỊA ĐIỂM ====================
@@ -329,18 +399,14 @@ def get_role_from_title(title: str) -> Optional[str]:
     """
     Duyệt qua ROLE_MAPPING, trả về role chuẩn đầu tiên khớp.
     Nếu không khớp bất kỳ pattern nào, trả về None.
-    
-    Args:
-        title: Tiêu đề job (có thể chứa nhiều từ khóa)
-    
-    Returns:
-        str: Role chuẩn nếu khớp pattern
-        None: Nếu không khớp bất kỳ pattern nào
     """
     title_lower = title.lower()
     for pattern, role in ROLE_MAPPING:
         if re.search(pattern, title_lower):
             return role
+    # Fallback: nếu title chứa "data" hoặc "analytics" -> Unclassified
+    if re.search(r'\bdata\b|\banalytics\b', title_lower):
+        return "Data Professional"
     return None
 
 def get_seniority_from_title_and_exp(title: str, exp_min: int) -> str:
