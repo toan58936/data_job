@@ -72,12 +72,118 @@ def normalize_topcv(record: Dict[str, Any]) -> Dict[str, Any]:
         "original_title": record.get("original_title"),
 
         # === ITVIEC-SPECIFIC FIELDS (để NULL cho TopCV) ===
-        "salary_source": None,
-        "salary_hidden": None,
-        "is_negotiable": False,
-        "currency": None,
-        "unit": None,
-        "work_model": None,
+        salary_source: None,
+        salary_hidden: None,
+        is_negotiable: False,
+        currency: None,
+        unit: None,
+        work_model: None,
+    }
+
+
+def normalize_itviec(record: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Chuẩn hóa record từ ITviec.
+    
+    ITviec schema (từ listing + detail):
+        - job_id: str (itviec_slug)
+        - source: str (ITviec)
+        - job_url: str
+        - job_title: str
+        - company_name: str
+        - location: str
+        - work_model: str (Onsite/Hybrid/Remote/At office)
+        - salary_hidden: bool
+        - skills: list[str]
+        - posted_text: str
+        - collected_at: str
+        - salary_text: str
+        - salary_min: float
+        - salary_max: float
+        - currency: str (USD/VND)
+        - unit: str (MONTH/YEAR/HOUR)
+        - salary_source: str (json-ld/html-label/...)
+        - isNegotiable: bool
+        - description: str
+        - requirements: str
+        - benefits: str
+        - experience: str
+        - detail_crawled_at: str
+    """
+    # Xử lý salary pre-parsed
+    salary_pre = None
+    salary_hidden = record.get('salary_hidden', False)
+    if record.get("salary_min") is not None or record.get("salary_max") is not None:
+        salary_pre = {
+            "min": record.get("salary_min"),
+            "max": record.get("salary_max"),
+            "currency": record.get("currency"),
+            "unit": record.get("unit"),
+            "is_negotiable": record.get("isNegotiable", False),
+        }
+
+    # Xử lý skills pre-extracted
+    skills_pre = record.get("skills")
+    if not isinstance(skills_pre, list) or len(skills_pre) == 0:
+        skills_pre = None
+
+    # Xác định salary_source_type
+    salary_source = record.get("salary_source", "")
+    if salary_pre and (salary_pre.get('min') is not None or salary_pre.get('max') is not None):
+        salary_source_type = "explicit"
+    elif salary_hidden or (isinstance(salary_source, str) and "competitive" in salary_source.lower()):
+        salary_source_type = "negotiable"
+    elif salary_hidden:
+        salary_source_type = "hidden"
+    elif not salary_source or salary_source == "none":
+        salary_source_type = "not_found"
+    else:
+        salary_source_type = "explicit"
+
+    return {
+        # === IDENTIFIERS ===
+        "source": "itviec",
+        "job_id": record.get("job_id"),
+        "job_url": record.get("job_url"),
+
+        # === CORE FIELDS ===
+        "title": record.get("job_title"),
+        "company": record.get("company_name"),
+        "location_raw": record.get("location"),
+
+        # === SALARY ===
+        "salary_raw": record.get("salary_text"),
+        "salary_pre_parsed": salary_pre,
+        "salary_source_type": salary_source_type,
+        "salary_hidden": salary_hidden,
+        "salary_source": salary_source,
+
+        # === EXPERIENCE ===
+        "experience_raw": record.get("experience"),
+
+        # === SKILLS ===
+        "skills_pre_extracted": skills_pre,
+
+        # === TEXT CONTENT ===
+        "description": record.get("description"),
+        "requirements": record.get("requirements"),
+        "benefits": record.get("benefits"),
+
+        # === METADATA ===
+        "crawled_at": record.get("collected_at") or record.get("detail_crawled_at"),
+        "deadline": None,  # ITviec không có deadline rõ ràng
+        "level": None,
+        "number_of_hires": None,
+        "job_type": None,
+        "working_time": None,
+        "location_detail": None,
+        "original_title": record.get("job_title"),
+
+        # === ITVIEC-SPECIFIC FIELDS ===
+        "is_negotiable": record.get("isNegotiable", False),
+        "currency": record.get("currency"),
+        "unit": record.get("unit"),
+        "work_model": record.get("work_model"),
     }
 
 

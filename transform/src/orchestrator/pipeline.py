@@ -123,6 +123,8 @@ def process_record(record: Dict[str, Any]) -> SilverJob:
         normalized_role=normalized_role,
         skills=skills,
         domain_keywords=domain_keywords,
+        salary_source_type=record.get('salary_source_type'),
+        salary_hidden=record.get('salary_hidden', False),
         description=record.get('description'),
         requirements=record.get('requirements'),
         benefits=record.get('benefits'),

@@ -59,7 +59,37 @@ def check_accuracy(
     }
 
     # 3.2: is_negotiable = False nhưng cả salary_min và salary_max đều null
-    # BỎ QUA CHECK NÀY VÌ GÂY FALSE POSITIVE CHO ITVIEC (lương ẩn)
+    # CHỈ flag VIOLATION nếu KHÔNG phải do lương bị ẩn bởi platform (salary_hidden)
+    # hoặc crawler không tìm thấy salary (salary_source == 'none' hoặc 'not_found')
+    violations = []
+    if 'is_negotiable' in df.columns and 'salary_min' in df.columns and 'salary_max' in df.columns:
+        # Điều kiện: non-negotiable + no salary + KHÔNG phải hidden/not_found
+        salary_hidden_col = df.get('salary_hidden')
+        salary_source_col = df.get('salary_source')
+        
+        base_mask = (df['is_negotiable'] == False) & df['salary_min'].isna() & df['salary_max'].isna()
+        
+        # Nếu có salary_hidden column, loại trừ những record có salary_hidden=True
+        if salary_hidden_col is not None:
+            hidden_mask = base_mask & (salary_hidden_col != True)
+        else:
+            hidden_mask = base_mask
+        
+        # Nếu có salary_source column, loại trừ những record có salary_source là 'none' hoặc 'not_found'
+        if salary_source_col is not None:
+            source_mask = hidden_mask & ~salary_source_col.isin(['none', 'not_found', ''])
+        else:
+            source_mask = hidden_mask
+        
+        if source_mask.any():
+            cols = ['job_url', 'is_negotiable', 'salary_min', 'salary_max']
+            avail_cols = [c for c in cols if c in df.columns]
+            violations = df[source_mask][avail_cols].to_dict('records')
+    results['accurate_non_negotiable_salary'] = {
+        'violations': len(violations),
+        'status': 'OK' if len(violations) == 0 else 'WARNING',
+        'details': violations
+    }
 
     # 3.3: Outlier VND (>500 triệu)
     violations = []
